@@ -3,7 +3,7 @@ import { Dummy } from "model/dummy"
 
 function App() {
   useEffect(() => {
-    let dummy = new Dummy()
+    let dummy = new Dummy(800, 600)
     dummy.doSomething() 
   })
 
