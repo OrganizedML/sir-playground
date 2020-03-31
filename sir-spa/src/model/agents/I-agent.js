@@ -13,17 +13,24 @@ class Infected extends Agent {
     
     // step
     step(){
-        this.move()
+        var to_r = -1
+
         // interact agents
         if (this.steps_since_infection > this.model.duration_mean) {
-            // move to removed
-            // todo
+            to_r = this.unique_id
+
         } else {
+            this.spread_infection();
+            // move
+            this.move()
+
+            // spread in new position
             this.spread_infection();
             this.steps_since_infection += 1;
         }
-        
+
         // interact model - administration
+        return to_r
     }
 
 }

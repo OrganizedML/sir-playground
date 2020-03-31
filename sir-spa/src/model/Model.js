@@ -55,6 +55,7 @@ class SIR_Model {
       this.s_list = [];
       this.r_list = [];
       this.i_list = [];
+
       this.space = new Space(this.width, this.height);
 
       // setup population
@@ -71,9 +72,9 @@ class SIR_Model {
 
       //setup infected agents
       for (var u2 of range((unique_id + 1), (unique_id + this.initial_infected))) {
-        var pos = this.space.get_random_position_empty();
+        pos = this.space.get_random_position_empty();
 
-        var new_agent = new Infected(u2, pos, this);
+        new_agent = new Infected(u2, pos, this);
 
         this.i_list.push(new_agent);
         
@@ -81,42 +82,118 @@ class SIR_Model {
       }
     }
 
+    move_to_r(list_uids, from) {
+      var uid;
+      var agent;
+
+      for (uid of list_uids) {
+        if (from == "s") {
+          agent = this.s_list.filter(function(value, index, arr){ return value.unique_id === uid;})[0];
+
+          // delete
+          this.s_list = this.s_list.filter(function(value, index, arr){ return value.unique_id !== uid;})
+          // agent undefined?
+          this.space.remove_agent(agent);
+
+        } else if (from == "i") {
+          agent = this.i_list.filter(function(value, index, arr){ return value.unique_id === uid;})[0];
+
+          // delete
+          this.s_list = this.i_list.filter(function(value, index, arr){ return value.unique_id !== uid;})
+          this.space.remove_agent(agent);
+
+        } else {
+          console.log("Error switching class to Removed")
+        }
+
+        // add new
+        var new_agent = new Removed(agent.unique_id, agent.position, this, 
+          agent.now_in_center, agent.last_pos);
+
+        this.r_list.push(new_agent);        
+        this.space.add_agent(new_agent, new_agent.position);
+      }
+    }
+
+    move_to_i(list_uids) {
+      var uid;
+
+      for (uid of list_uids) {
+        var agent = this.s_list.filter(function(value, index, arr){ return value.unique_id === uid;})[0];
+
+        // delete
+        this.s_list = this.s_list.filter(function(value, index, arr){ return value.unique_id !== uid;})
+        this.space.remove_agent(agent);
+
+        // add new
+        var new_agent = new Infected(agent.unique_id, agent.position, this, 
+          agent.now_in_center, agent.last_pos, agent.steps_since_infection);
+
+        this.i_list.push(new_agent);        
+        this.space.add_agent(new_agent, new_agent.position);
+      }
+    }
+
     step_s(){
-      // call the step function for every agent + save class changes +
-      // apply class changes +
       var to_r = [];
       var to_i = [];
 
+      // iterate over every agent in s_list - apply step
       for (var key in this.s_list) {
-        this.s_list[key].step()
+        var add_r, add_i = this.s_list[key].step(); // if class change -> no move
+        if (add_r >= 0) {
+          to_r.push(add_r);
+
+        } else if (add_i >= 0) {
+          to_i.push(add_i);
+
+        }
       }
-      // if class change -> no move -> directly apply change
+      
+      // move agents to other class
+      if (to_r.length > 0) {
+        this.move_to_r(to_r, "s");
+      } else if (to_i.length > 0) {
+        this.move_to_i(to_i);
+      }
 
       // calculate count
       var healthy = this.s_list.filter(function (el) {
         return !el.infected
       });
 
+      // return for statistics
       return [healthy.length, this.s_list.length - healthy.length] 
     }
 
     step_i(){
-      // call the step function for every agent + save class changes +
-      // apply class changes +
       var to_r = [];
 
+      // iterate over every agent in s_list - apply step
       for (var key in this.i_list) {
-        this.i_list[key].step()
+        var add_r = this.i_list[key].step();
+        if (add_r >= 0) {
+          to_r.push(add_r);
+        }
       }
 
+      // move agents to other class
+      if (to_r.length > 0) {
+        this.move_to_r(to_r, "i");
+      }
+
+      // return for statistics
       return this.i_list.length - to_r.length
     }
       
     step_r() {
+
+      // iterate over every agent in s_list - apply step
       for (var key in this.r_list) {
-        this.r_list[key].step()
+        this.r_list[key].step();
       }
 
+      // return for statistics
       return this.r_list.length
     }
 
@@ -144,6 +221,7 @@ class SIR_Model {
       */
     }
 
+    // remove sleep - regelmäßiges aufrufen - step methoden bei aufruf
     async run() {
       this.reset()
       this.initialize()

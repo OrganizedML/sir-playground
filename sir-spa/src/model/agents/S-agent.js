@@ -12,22 +12,31 @@ class Susceptible extends Agent {
     
     // step
     step(){
-        // move agent
-        this.move()
+        var to_i = -1;
+        var to_r = -1;
+
+        // todo: faster if not whole array?
         // interact with other agents
         if (this.infected) {
             if (this.steps_since_infection > this.model.duration_mean) {
-                // move to removed
-                // todo
+                to_r = this.unique_id;
+
             } else if (Math.random() < this.model.infection_recoginition_probability) {
-                // move to infected
-                // todo
+                to_i = this.unique_id;
+
             } else {
                 // infected but not recognized
+                this.spread_infection();
+                // move agent
+                this.move()
+                // spread in new position
                 this.spread_infection();
                 this.steps_since_infection += 1;
             }
         }
+                
+        // interact with admin
+        return to_r, to_i
     }
 
 }

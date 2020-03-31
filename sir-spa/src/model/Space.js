@@ -109,8 +109,6 @@ class Space {
         } else {
             console.log("Error moving agent")
         }
-        
-
     }
 }
 
