@@ -75,13 +75,13 @@ class Space {
         return list
     }
 
-    get_agents_inRange(position, range) {
-        // range nur ganze zellen
+    get_agents_inRange(position, infection_range) {
+
         var list = [];
         // Rand ist Ende der Welt
-        for(var x of range(position[0]-range, position[0]+range)) {
+        for(var x of range((position[0]-infection_range), (position[0]+infection_range))) {
             if (x < this.width && x >= 0) {
-                for(var y of range(position[1]-range, position[1]+range)) {
+                for(var y of range((position[1]-infection_range), (position[1]+infection_range))) {
                     if (y < this.height && y >= 0) {
                         if (this.world[x][y][0] == 1 && [x,y] != position) {
                             list.push(this.world[x][y][1]); // push the unique_id

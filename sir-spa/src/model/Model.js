@@ -130,8 +130,9 @@ class SIR_Model {
       console.log("Susceptible with Infection:" + num_sus[1]);
       console.log("Identified Infected:" + num_inf);
       console.log("Removed - Recovered:" + num_rem);
+      console.log("Basic Reproduction Numver:" + "todo");
 
-      // DEBUG:
+      // DEBUG Movement:
       /*
       var current_world = this.space.world;
       console.log("printing step: "+ num)
