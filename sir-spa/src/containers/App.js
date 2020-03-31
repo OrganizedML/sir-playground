@@ -10,16 +10,14 @@ import {
   Slider,
   MenuItem,
   Select,
-  FormControl,
-  InputLabel
+  Button
 } from "@material-ui/core";
+import { PixiRenderer } from "components/PixiRenderer";
 
 function App() {
-  useEffect(() => {
-    let dummy = new Dummy();
-    dummy.doSomething();
-  });
+  console.log("render parent");
 
+  const [gameState, setGameState] = useState({ status: "stopped" });
   const [initialInfected, setInitialInfected] = useState(1);
   const [initialSuspectible, setInitialSuspectible] = useState(25);
   const [probabilityRecognized, setProbabilityRecognized] = useState(0.1);
@@ -112,7 +110,8 @@ function App() {
 
                 <Typography variant="overline" gutterBottom>
                   Profile
-                </Typography><br/>
+                </Typography>
+                <br />
                 <Select
                   fullWidth
                   variant="outlined"
@@ -127,9 +126,24 @@ function App() {
                   </MenuItem>
                   <MenuItem value={"meet_friends"}>Meet Friends</MenuItem>
                 </Select>
+                <Box mt={2}>
+                <Button
+                  fullWidth
+                  color="primary"
+                  variant="contained"
+                  size="large"
+                  onClick={() => {
+                    setGameState({ status: "running" });
+                  }}
+                >
+                  Start
+                </Button>
+                </Box>
               </Box>
             </Grid>
-            <Grid item xs={8}></Grid>
+            <Grid item xs={8}>
+              <PixiRenderer gameState={gameState} />
+            </Grid>
           </Grid>
         </Container>
       </Box>
