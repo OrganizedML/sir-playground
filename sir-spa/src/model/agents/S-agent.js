@@ -19,3 +19,5 @@ class Susceptible extends Agent {
     }
 
 }
+
+export { Susceptible }

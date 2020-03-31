@@ -1,6 +1,6 @@
 import { Agent } from "model/agents/basic-agent"
 
-class Susceptible extends Agent {
+class Infected extends Agent {
     constructor(unique_id, position, model, now_in_center=false,
         last_pos=undefined, steps_since_infection=0) {
 
@@ -19,3 +19,5 @@ class Susceptible extends Agent {
     }
 
 }
+
+export { Infected }

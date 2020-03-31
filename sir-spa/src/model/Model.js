@@ -1,10 +1,13 @@
-
+import { Susceptible } from "model/agents/S-agent"
+import { Removed } from "model/agents/R-agent"
+import { Infected } from "model/agents/I-agent"
+import { Space } from "model/Space"
 
 class SIR_Model {
   // agent based SIR-Model
     constructor(
-        population=200, 
-        initial_infected=5, 
+        population=3, 
+        initial_infected=1, 
         infection_radius=2,
         infection_probability_onContact=0.25,
         duration_mean=10,
@@ -19,28 +22,111 @@ class SIR_Model {
       this.duration_mean = duration_mean;
       this.infection_recoginition_probability = infection_recoginition_probability;
       this.max_step = max_step;
-        
-      // todo
-      this.space = new Space();
+      this.movement = "random";
+
+      this.width = 200
+      this.height = 200
+      
     }
 
     reset() {
-      // delete all old data
+      if (typeof this.s_list !== "undefined") {
+        //this.s_list.forEach(function(agent){ delete agent }); // no destructor?
+        delete this.s_list;
+      }
+
+      if (typeof this.r_list !== "undefined") {
+        //this.r_list.forEach(function(agent){ delete agent });
+        delete this.r_list
+      }
+
+      if (typeof this.i_list !== "undefined") {
+        //this.i_list.forEach(function(agent){ delete agent });
+        delete this.i_list
+      }
+      if (typeof this.space !== "undefined") {
+        delete this.space
+      }
+
+      // del every agent ?
     }
 
     initialize() {
-      // setup 3 lists + 
-      // setup parameters + 
-      // create agents +
-      // add agents to lists
+      this.s_list = [];
+      this.r_list = [];
+      this.i_list = [];
+      this.space = new Space(this.width, this.height);
+
+      // setup population
+      var unique_id;
+      for (unique_id of range(1, (this.population - this.initial_infected))) {
+        var pos = this.space.get_random_position_empty();
+
+        var new_agent = new Susceptible(unique_id, pos, this);
+
+        this.s_list.push(new_agent);
+        
+        this.space.add_agent(new_agent, pos);
+      }
+
+      //setup infected agents
+      for (var u2 of range((unique_id + 1), (unique_id + this.initial_infected))) {
+        var pos = this.space.get_random_position_empty();
+
+        var new_agent = new Infected(u2, pos, this);
+
+        this.i_list.push(new_agent);
+        
+        this.space.add_agent(new_agent, pos);
+      }
+    }
+
+    step_s(){
+      // call the step function for every agent + save class changes +
+      // apply class changes +
+      var to_r = [];
+      var to_i = [];
+
+      for (var key in this.s_list) {
+        this.s_list[key].step()
+      }
+    }
+
+    step_i(){
+      // call the step function for every agent + save class changes +
+      // apply class changes +
+      var to_r = [];
+
+      for (var key in this.i_list) {
+        this.i_list[key].step()
+      }
+
+    }
+      
+    step_r() {
+      // call the step function for every agent + save class changes +
+      // apply class changes +
+      for (var key in this.r_list) {
+        this.r_list[key].step()
+      }
     }
 
     step() {
-      // iterate over every agent +
-      // call the step function for every agent + save class changes +
-      // apply class changes +
+      this.step_s()
+      this.step_i()
+      this.step_r()
       // print canvas +
       // set current statistics as info for dashboard
+
+      // DEBUG:
+      var current_world = this.space.world;
+
+      for(var i = 0; i < current_world.length; i++) {
+        for(var z = 0; z < current_world.length; z++) {
+          console.log(current_world[z][i]);
+        }
+      }
+
     }
 
     async run() {
