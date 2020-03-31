@@ -10,15 +10,24 @@ class Susceptible extends Agent {
       this.steps_since_infection = steps_since_infection;
     }
     
-    
     // step
     step(){
+        // move agent
         this.move()
+        // interact with other agents
         if (this.infected) {
-            this.spread_infection()
+            if (this.steps_since_infection > this.model.duration_mean) {
+                // move to removed
+                // todo
+            } else if (Math.random() < this.model.infection_recoginition_probability) {
+                // move to infected
+                // todo
+            } else {
+                // infected but not recognized
+                this.spread_infection();
+                this.steps_since_infection += 1;
+            }
         }
-        // interact agents
-        // interact model - administration
     }
 
 }

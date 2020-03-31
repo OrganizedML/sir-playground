@@ -15,6 +15,14 @@ class Infected extends Agent {
     step(){
         this.move()
         // interact agents
+        if (this.steps_since_infection > this.model.duration_mean) {
+            // move to removed
+            // todo
+        } else {
+            this.spread_infection();
+            this.steps_since_infection += 1;
+        }
+        
         // interact model - administration
     }
 
