@@ -15,6 +15,7 @@ import {
 import { PixiRenderer } from "components/PixiRenderer";
 
 function App() {
+
   console.log("render parent");
 
   const [gameState, setGameState] = useState({ status: "stopped" });
@@ -24,6 +25,12 @@ function App() {
   const [infectionRadius, setInfectionRadius] = useState(1);
   const [spreadProbability, setSpreadProbability] = useState(0.3);
   const [profile, setProfile] = useState("unrestricted");
+
+  useEffect(() => {
+    let dummy = new Dummy(800, 600)
+    dummy.doSomething() 
+  })
+
 
   return (
     <Box display="flex" flexDirection="column" className="App" height="100%">
