@@ -5,6 +5,7 @@ class Space {
         // only 2D - only 1 agent per cell
         this.world = [...Array(this.height)].map(x=>Array(this.width).fill([0, 0]))  
         this.agent_list = []
+        // -> Nachbarschaftsliste - kontinuerlicher Raum - l n liste WiPro
     }
 
     add_agent(agent, position) {

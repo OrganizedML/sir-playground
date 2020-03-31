@@ -197,7 +197,7 @@ class SIR_Model {
       return this.r_list.length
     }
 
-    step(num) {
+    step() {
       var num_sus = this.step_s()
       var num_inf = this.step_i()
       var num_rem = this.step_r()
@@ -221,17 +221,23 @@ class SIR_Model {
       */
     }
 
+
     // remove sleep - regelmäßiges aufrufen - step methoden bei aufruf
     async run() {
       this.reset()
       this.initialize()
       for (var i of range(1, this.max_step)) {
         console.log("step"+i);
-        this.step(i)
+        
+        this.step()
+        // world state - > from 
+        // this.s_list = [];
+        // this.r_list = [];
+        // this.i_list = [];
+
         await Sleep(500);
       }
     }
-
   }
 
 function range(start, end) {
