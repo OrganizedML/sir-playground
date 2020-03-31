@@ -6,8 +6,8 @@ import { Space } from "model/Space"
 class SIR_Model {
   // agent based SIR-Model
     constructor(
-        population=3, 
-        initial_infected=1, 
+        population=200, 
+        initial_infected=5, 
         infection_radius=2,
         infection_probability_onContact=0.25,
         duration_mean=10,
@@ -24,8 +24,8 @@ class SIR_Model {
       this.max_step = max_step;
       this.movement = "random";
 
-      this.width = 200
-      this.height = 200
+      this.width = 20
+      this.height = 20
       
     }
 
@@ -90,6 +90,14 @@ class SIR_Model {
       for (var key in this.s_list) {
         this.s_list[key].step()
       }
+      // if class change -> no move -> directly apply change
+
+      // calculate count
+      var healthy = this.s_list.filter(function (el) {
+        return !el.infected
+      });
+
+      return [healthy.length, this.s_list.length - healthy.length] 
     }
 
     step_i(){
@@ -101,32 +109,38 @@ class SIR_Model {
         this.i_list[key].step()
       }
 
+      return this.i_list.length - to_r.length
     }
       
     step_r() {
-      // call the step function for every agent + save class changes +
-      // apply class changes +
       for (var key in this.r_list) {
         this.r_list[key].step()
       }
+
+      return this.r_list.length
     }
 
-    step() {
-      this.step_s()
-      this.step_i()
-      this.step_r()
+    step(num) {
+      var num_sus = this.step_s()
+      var num_inf = this.step_i()
+      var num_rem = this.step_r()
       // print canvas +
       // set current statistics as info for dashboard
+      console.log("Susceptible:" + num_sus[0]);
+      console.log("Susceptible with Infection:" + num_sus[1]);
+      console.log("Identified Infected:" + num_inf);
+      console.log("Removed - Recovered:" + num_rem);
 
       // DEBUG:
+      /*
       var current_world = this.space.world;
-
+      console.log("printing step: "+ num)
       for(var i = 0; i < current_world.length; i++) {
         for(var z = 0; z < current_world.length; z++) {
           console.log(current_world[z][i]);
         }
       }
-
+      */
     }
 
     async run() {
@@ -134,7 +148,7 @@ class SIR_Model {
       this.initialize()
       for (var i of range(1, this.max_step)) {
         console.log("step"+i);
-        this.step()
+        this.step(i)
         await Sleep(500);
       }
     }

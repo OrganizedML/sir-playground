@@ -1,6 +1,3 @@
-
-
-// grid hier generieren?
 class Space {
     constructor(width, height){
         this.width = width;
@@ -63,10 +60,10 @@ class Space {
 
         var list = [];
         // Rand ist Ende der Welt
-        for(var x of range(position[0]-1, position[0]+1)) {
-            if (x <= this.width && x >= 0) {
-                for(var y of range(position[1]-1, position[1]+1)) {
-                    if (y <= this.height && y >= 0) {
+        for(var x of range((position[0]-1), (position[0]+1))) {
+            if (x < this.width && x >= 0) {
+                for(var y of range((position[1] - 1), (position[1] + 1))) {
+                    if (y < this.height && y >= 0) {
                         if (this.world[x][y][0] == 0 && [x,y] != position) {
                             list.push([x,y]);
                         }
@@ -83,9 +80,9 @@ class Space {
         var list = [];
         // Rand ist Ende der Welt
         for(var x of range(position[0]-range, position[0]+range)) {
-            if (x <= this.width && x >= 0) {
+            if (x < this.width && x >= 0) {
                 for(var y of range(position[1]-range, position[1]+range)) {
-                    if (y <= this.height && y >= 0) {
+                    if (y < this.height && y >= 0) {
                         if (this.world[x][y][0] == 1 && [x,y] != position) {
                             list.push(this.world[x][y][1]); // push the unique_id
                         }
@@ -101,12 +98,18 @@ class Space {
         
         var found_index = this.agent_list.findIndex(element => element[0] == agent.unique_id);
         var agent_inList = this.agent_list[found_index];
-        var old_pos = agent_inList[1];
+        
 
-        this.world[old_pos[0]][old_pos[1]] = [0, 0];
-        this.world[new_position[0]][new_position[1]] = [1, agent.unique_id];
+        if (agent_inList.length ) {
+            var old_pos = agent_inList[1];
 
-        this.agent_list[found_index][1] = new_position;
+            this.world[old_pos[0]][old_pos[1]] = [0, 0];
+            this.world[new_position[0]][new_position[1]] = [1, agent.unique_id];
+            this.agent_list[found_index][1] = new_position;
+        } else {
+            console.log("Error moving agent")
+        }
+        
 
     }
 }

@@ -14,6 +14,9 @@ class Susceptible extends Agent {
     // step
     step(){
         this.move()
+        if (this.infected) {
+            this.spread_infection()
+        }
         // interact agents
         // interact model - administration
     }
