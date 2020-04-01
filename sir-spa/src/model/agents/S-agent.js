@@ -23,9 +23,7 @@ class Susceptible extends Agent {
             if (this.steps_since_infection > this.model.duration_mean) {
                 to_r = this.unique_id;
 
-            } else if (Math.random() < this.model.infection_recoginition_probability// && 
-            //this.steps_since_infection > this.model.steps_till_symptoms
-            ) {
+            } else if (Math.random() < this.model.infection_recoginition_probability && this.steps_since_infection > this.model.steps_till_symptoms) {
                 to_i = this.unique_id;
 
             } else {

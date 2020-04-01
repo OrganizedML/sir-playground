@@ -7,7 +7,7 @@ class Dummy {
     }
 
     doSomething () {
-        let model = new SIR_Model(200, 3, 1, 0.1, 3, 0.8, 200);
+        let model = new SIR_Model(300, 3, 1, 0.1, 8, 0.9, 75);
         console.log("Starting Model loop");
         model.run();
     }
