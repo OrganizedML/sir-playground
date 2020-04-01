@@ -62,6 +62,7 @@ class SIR_Model {
       this.old_R = [0, 0, 0];
       this.old_I = [this.initial_infected, this.initial_infected, this.initial_infected];
       this.old_S = [this.population - this.initial_infected, this.population - this.initial_infected, this.population - this.initial_infected];
+      this.R_array = [1.0, 1.0]; // Todo
       // grid world model
       this.space = new Space(this.width, this.height);
 
@@ -258,7 +259,12 @@ class SIR_Model {
       console.log("Susceptible with Infection:" + num_sus[1]);
       console.log("Identified Infected:" + num_inf);
       console.log("Removed - Recovered:" + num_rem);
-      console.log("Basic Reproduction Number (calculated):" + this.calculate_R0(num_sus[0], (num_inf + num_sus[1]), num_rem));
+
+      var curr_R0 = this.calculate_R0(num_sus[0], (num_inf + num_sus[1]), num_rem);
+      this.R_array.push(curr_R0);
+      console.log("Basic Reproduction Number (current):" + curr_R0);
+      var R0_mean = this.R_array.slice(-10).reduce(function(pv, cv) { return pv + cv; }, 0) / this.R_array.slice(-10).length;
+      console.log("Basic Reproduction Number (mean, last 10):" + R0_mean);
 
       if (num_inf + num_sus[1] == 0) {
         return true;
@@ -279,10 +285,6 @@ class SIR_Model {
           console.log("Reached end of Simulation after "+i+"steps.");
           break
          }
-        // world state - > from 
-        // this.s_list = [];
-        // this.r_list = [];
-        // this.i_list = [];
 
         await Sleep(200);
       }
