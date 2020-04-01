@@ -3,6 +3,10 @@ import { Removed } from "model/agents/R-agent"
 import { Infected } from "model/agents/I-agent"
 import { Space } from "model/Space"
 
+// Todo: Basic reproduction number implementieren
+// Todo: fix add - remove
+// Todo: movement grid -> continuous
+
 class SIR_Model {
   // agent based SIR-Model
     constructor(
@@ -26,7 +30,6 @@ class SIR_Model {
 
       this.width = 20
       this.height = 20
-      
     }
 
     reset() {
@@ -84,22 +87,22 @@ class SIR_Model {
 
     move_to_r(list_uids, from) {
       var uid;
-      var agent;
 
       for (uid of list_uids) {
         if (from == "s") {
-          agent = this.s_list.filter(function(value, index, arr){ return value.unique_id === uid;})[0];
+          var agent = this.s_list.filter(function(value, index, arr){ return value.unique_id === uid;})[0];
 
           // delete
-          this.s_list = this.s_list.filter(function(value, index, arr){ return value.unique_id !== uid;})
-          // agent undefined?
+          this.s_list = this.s_list.filter(function(value, index, arr){ return value.unique_id !== uid;});
+          // remove agent from world
           this.space.remove_agent(agent);
 
         } else if (from == "i") {
-          agent = this.i_list.filter(function(value, index, arr){ return value.unique_id === uid;})[0];
+          var agent = this.i_list.filter(function(value, index, arr){ return value.unique_id === uid;})[0];
 
           // delete
-          this.s_list = this.i_list.filter(function(value, index, arr){ return value.unique_id !== uid;})
+          this.i_list = this.i_list.filter(function(value, index, arr){ return value.unique_id !== uid;});
+          // remove agent from world
           this.space.remove_agent(agent);
 
         } else {
