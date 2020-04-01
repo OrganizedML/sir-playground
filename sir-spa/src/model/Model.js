@@ -25,6 +25,7 @@ class SIR_Model {
       this.infection_probability_onContact = infection_probability_onContact;
       this.duration_mean = duration_mean;
       this.infection_recoginition_probability = infection_recoginition_probability;
+      this.steps_till_symptoms = 1;
       this.max_step = max_step;
       this.movement = "random";
 
@@ -204,6 +205,13 @@ class SIR_Model {
       console.log("Removed - Recovered:" + num_rem);
       console.log("Basic Reproduction Number:" + "todo");
 
+      if (num_inf + num_sus[1] == 0) {
+        return true;
+      } else {
+        return false;
+      }
+
+
       // DEBUG Movement:
       /*
       var current_world = this.space.world;
@@ -222,15 +230,19 @@ class SIR_Model {
       this.reset()
       this.initialize()
       for (var i of range(1, this.max_step)) {
-        console.log("step"+i);
+        console.log("Step: "+i);
         
-        this.step()
+         var ret = this.step()
+         if (ret) {
+          console.log("Reached end of Simulation after "+i+"steps.");
+          break
+         }
         // world state - > from 
         // this.s_list = [];
         // this.r_list = [];
         // this.i_list = [];
 
-        await Sleep(500);
+        await Sleep(200);
       }
     }
   }
