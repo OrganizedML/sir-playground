@@ -60,8 +60,8 @@ class SIR_Model {
       this.i_list = [];
       // R0
       this.old_R = [0, 0, 0];
-      this.old_I = [0, 0, 0];
-      this.old_S = [0, 0, 0];
+      this.old_I = [this.initial_infected, this.initial_infected, this.initial_infected];
+      this.old_S = [this.population - this.initial_infected, this.population - this.initial_infected, this.population - this.initial_infected];
       // grid world model
       this.space = new Space(this.width, this.height);
 
