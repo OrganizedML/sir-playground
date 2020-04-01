@@ -2,9 +2,10 @@ import { Agent } from "model/agents/basic-agent"
 
 class Infected extends Agent {
     constructor(unique_id, position, model, now_in_center=false,
-        last_pos=undefined, steps_since_infection=0) {
+        last_pos=undefined, steps_since_infection=0,
+        has_infected=0) {
 
-      super(unique_id, position, model, now_in_center, last_pos);
+      super(unique_id, position, model, now_in_center, last_pos, has_infected);
 
       this.infected = true;
       this.steps_since_infection = steps_since_infection;

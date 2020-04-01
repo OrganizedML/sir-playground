@@ -3,8 +3,6 @@ import { Removed } from "model/agents/R-agent"
 import { Infected } from "model/agents/I-agent"
 import { Space } from "model/Space"
 
-// Todo: Basic reproduction number implementieren
-// Todo: fix add - remove
 // Todo: movement grid -> continuous
 
 class SIR_Model {
@@ -56,10 +54,15 @@ class SIR_Model {
     }
 
     initialize() {
+      // agents
       this.s_list = [];
       this.r_list = [];
       this.i_list = [];
-
+      // R0
+      this.old_R = [0];
+      this.old_I = [0];
+      this.old_S = [0];
+      // grid world model
       this.space = new Space(this.width, this.height);
 
       // setup population
@@ -107,6 +110,8 @@ class SIR_Model {
         // add new
         var new_agent = new Removed(agent.unique_id, agent.position, this, 
           agent.now_in_center, agent.last_pos);
+        
+        new_agent.has_infected = agent.has_infected;
 
         this.r_list.push(new_agent);        
         this.space.add_agent(new_agent, new_agent.position);
@@ -126,6 +131,8 @@ class SIR_Model {
         // add new
         var new_agent = new Infected(agent.unique_id, agent.position, this, 
           agent.now_in_center, agent.last_pos, agent.steps_since_infection);
+        
+        new_agent.has_infected = agent.has_infected;
 
         this.i_list.push(new_agent);        
         this.space.add_agent(new_agent, new_agent.position);
@@ -193,6 +200,34 @@ class SIR_Model {
       return this.r_list.length
     }
 
+    calculate_R0(count_susceptible, count_infected, count_removed) {
+      // Todo: Basic reproduction number implementieren - https://web.stanford.edu/~jhj1/teachingdocs/Jones-Epidemics050308.pdf, https://wwwnc.cdc.gov/eid/article/25/1/17-1901_article
+      // R0 = βN / ν : β effective contact rate, ν removal rate; dr/dt = νi ; i = I/N, ds/dt = −βsi      
+      var i = count_infected / this.population;
+      var s = count_susceptible / this.population;
+      var r = count_removed / this.population;
+
+      var drdt = (count_removed - this.old_R.slice(-1)[0] + 0.000000001) / this.population;
+      var dsdt = (count_susceptible - this.old_S.slice(-1)[0] + 0.000000001) / this.population;
+
+      var beta = - 1/(s*i) * dsdt;
+      var ny = 1/i * drdt;
+      
+      this.old_R.push(count_removed);
+      this.old_S.push(count_susceptible);
+      this.old_I.push(count_infected);
+
+      return (beta * this.population / ny)
+    }
+
+    measure_R(count_infected_old) {
+      // es fehlt bezug zu zeitschritt - menge an infizierten beim letzten Schritt oder zu beginn
+      // get has infected of each agent and divide by infected - only active ? I, Sw/I - or with R?
+      var infections
+
+      return ( 1/count_infected)
+    }
+
     step() {
       var num_sus = this.step_s()
       var num_inf = this.step_i()
@@ -203,7 +238,9 @@ class SIR_Model {
       console.log("Susceptible with Infection:" + num_sus[1]);
       console.log("Identified Infected:" + num_inf);
       console.log("Removed - Recovered:" + num_rem);
-      console.log("Basic Reproduction Number:" + "todo");
+      // Where belong sus with infection but not tested ? 
+      console.log("Basic Reproduction Number (calculated):" + this.calculate_R0(num_sus[0] + num_sus[1], num_inf, num_rem));
+      console.log("Basic Reproduction Number (measured):" + this.measure_R());
 
       if (num_inf + num_sus[1] == 0) {
         return true;
@@ -223,7 +260,6 @@ class SIR_Model {
       }
       */
     }
-
 
     // remove sleep - regelmäßiges aufrufen - step methoden bei aufruf
     async run() {

@@ -2,12 +2,13 @@ import { Susceptible } from "./S-agent";
 
 class Agent{
     constructor(unique_id, position, model, now_in_center=false,
-        last_pos=undefined){
+        last_pos=undefined, has_infected=0){
             this.unique_id = unique_id;
             this.position = position;
             this.now_in_center = now_in_center;
             this.model = model;
             this.last_pos = last_pos;
+            this.has_infected = has_infected;
 
             this.x = undefined;
             this.y = undefined;
@@ -38,6 +39,7 @@ class Agent{
             if (typeof agent !== "undefined") {
                 if (agent.className == "Susceptible" && agent.infected == false && Math.random() < this.model.infection_probability_onContact) {
                     agent.infected = true;
+                    this.has_infected += 1;
                 }
             }
         }
