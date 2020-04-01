@@ -8,6 +8,7 @@ class Infected extends Agent {
 
       this.infected = true;
       this.steps_since_infection = steps_since_infection;
+      this.className = "Infected";
     }
     
     

@@ -1,3 +1,5 @@
+import { Susceptible } from "./S-agent";
+
 class Agent{
     constructor(unique_id, position, model, now_in_center=false,
         last_pos=undefined){
@@ -31,17 +33,12 @@ class Agent{
     spread_infection() {
         var agents_inRange_UIDS = this.model.space.get_agents_inRange(this.position, this.model.infection_radius);
 
-        // var nonInfected_agents_inRange = []
-        /*agents_inRange_UIDS.forEach(function(uid, key, array) {
-            if (uid in this.model.s_list && this.model.s_list[uid].infected == false && Math.random() < this.model.infection_probability_onContact) {
-                // nonInfected_agents_inRange.push(uid);
-                this.model.s_list[uid].infected = true;
-            }
-        });*/
         for (var uid of agents_inRange_UIDS) {
-            if (uid in this.model.s_list && this.model.s_list[uid].infected == false && Math.random() < this.model.infection_probability_onContact) {
-                // nonInfected_agents_inRange.push(uid);
-                this.model.s_list[uid].infected = true;
+            var agent = this.model.s_list.filter(function(object, index, arr){ return object.unique_id === uid;})[0];
+            if (typeof agent !== "undefined") {
+                if (agent.className == "Susceptible" && agent.infected == false && Math.random() < this.model.infection_probability_onContact) {
+                    agent.infected = true;
+                }
             }
         }
     }

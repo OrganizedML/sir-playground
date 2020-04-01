@@ -8,6 +8,7 @@ class Susceptible extends Agent {
 
       this.infected = infected;
       this.steps_since_infection = steps_since_infection;
+      this.className = "Susceptible";
     }
     
     // step

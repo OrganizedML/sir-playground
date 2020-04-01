@@ -65,22 +65,18 @@ class SIR_Model {
       var unique_id;
       for (unique_id of range(1, (this.population - this.initial_infected))) {
         var pos = this.space.get_random_position_empty();
-
         var new_agent = new Susceptible(unique_id, pos, this);
-
+        // register agent
         this.s_list.push(new_agent);
-        
         this.space.add_agent(new_agent, pos);
       }
 
       //setup infected agents
       for (var u2 of range((unique_id + 1), (unique_id + this.initial_infected))) {
         pos = this.space.get_random_position_empty();
-
         new_agent = new Infected(u2, pos, this);
-
+        // register agent
         this.i_list.push(new_agent);
-        
         this.space.add_agent(new_agent, pos);
       }
     }
@@ -91,7 +87,6 @@ class SIR_Model {
       for (uid of list_uids) {
         if (from == "s") {
           var agent = this.s_list.filter(function(value, index, arr){ return value.unique_id === uid;})[0];
-
           // delete
           this.s_list = this.s_list.filter(function(value, index, arr){ return value.unique_id !== uid;});
           // remove agent from world
@@ -99,7 +94,6 @@ class SIR_Model {
 
         } else if (from == "i") {
           var agent = this.i_list.filter(function(value, index, arr){ return value.unique_id === uid;})[0];
-
           // delete
           this.i_list = this.i_list.filter(function(value, index, arr){ return value.unique_id !== uid;});
           // remove agent from world
@@ -146,10 +140,8 @@ class SIR_Model {
         var add_r, add_i = this.s_list[key].step(); // if class change -> no move
         if (add_r >= 0) {
           to_r.push(add_r);
-
         } else if (add_i >= 0) {
           to_i.push(add_i);
-
         }
       }
       
@@ -186,7 +178,7 @@ class SIR_Model {
       }
 
       // return for statistics
-      return this.i_list.length - to_r.length
+      return this.i_list.length
     }
       
     step_r() {
