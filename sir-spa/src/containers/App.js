@@ -43,7 +43,7 @@ function App() {
     newAgentList.push(...newIList)
 
     let newRList = model.r_list.map((agent) => {
-      agent.state = "removed"
+      agent.state = "recovered"
       return agent
     })
     newAgentList.push(...newRList)
