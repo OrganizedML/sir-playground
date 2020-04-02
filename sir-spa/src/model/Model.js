@@ -3,6 +3,8 @@ import { Removed } from "model/agents/R-agent"
 import { Infected } from "model/agents/I-agent"
 import { Space } from "model/Space"
 
+// Todo: movement grid -> continuous
+
 class SIR_Model {
   // agent based SIR-Model
     constructor(
@@ -21,12 +23,12 @@ class SIR_Model {
       this.infection_probability_onContact = infection_probability_onContact;
       this.duration_mean = duration_mean;
       this.infection_recoginition_probability = infection_recoginition_probability;
+      this.steps_till_symptoms = 2;
       this.max_step = max_step;
       this.movement = "random";
 
-      this.width = 20
-      this.height = 20
-      
+      this.width = 50
+      this.height = 50
     }
 
     reset() {
@@ -52,54 +54,54 @@ class SIR_Model {
     }
 
     initialize() {
+      // agents
       this.s_list = [];
       this.r_list = [];
       this.i_list = [];
-
+      // R0
+      this.old_R = [0, 0, 0];
+      this.old_I = [this.initial_infected, this.initial_infected, this.initial_infected];
+      this.old_S = [this.population - this.initial_infected, this.population - this.initial_infected, this.population - this.initial_infected];
+      this.R_array = [1.0, 1.0]; // Todo
+      // grid world model
       this.space = new Space(this.width, this.height);
 
       // setup population
       var unique_id;
       for (unique_id of range(1, (this.population - this.initial_infected))) {
         var pos = this.space.get_random_position_empty();
-
         var new_agent = new Susceptible(unique_id, pos, this);
-
+        // register agent
         this.s_list.push(new_agent);
-        
         this.space.add_agent(new_agent, pos);
       }
 
       //setup infected agents
       for (var u2 of range((unique_id + 1), (unique_id + this.initial_infected))) {
         pos = this.space.get_random_position_empty();
-
         new_agent = new Infected(u2, pos, this);
-
+        // register agent
         this.i_list.push(new_agent);
-        
         this.space.add_agent(new_agent, pos);
       }
     }
 
     move_to_r(list_uids, from) {
       var uid;
-      var agent;
 
       for (uid of list_uids) {
         if (from == "s") {
-          agent = this.s_list.filter(function(value, index, arr){ return value.unique_id === uid;})[0];
-
+          var agent = this.s_list.filter(function(value, index, arr){ return value.unique_id === uid;})[0];
           // delete
-          this.s_list = this.s_list.filter(function(value, index, arr){ return value.unique_id !== uid;})
-          // agent undefined?
+          this.s_list = this.s_list.filter(function(value, index, arr){ return value.unique_id !== uid;});
+          // remove agent from world
           this.space.remove_agent(agent);
 
         } else if (from == "i") {
-          agent = this.i_list.filter(function(value, index, arr){ return value.unique_id === uid;})[0];
-
+          var agent = this.i_list.filter(function(value, index, arr){ return value.unique_id === uid;})[0];
           // delete
-          this.s_list = this.i_list.filter(function(value, index, arr){ return value.unique_id !== uid;})
+          this.i_list = this.i_list.filter(function(value, index, arr){ return value.unique_id !== uid;});
+          // remove agent from world
           this.space.remove_agent(agent);
 
         } else {
@@ -109,6 +111,8 @@ class SIR_Model {
         // add new
         var new_agent = new Removed(agent.unique_id, agent.position, this, 
           agent.now_in_center, agent.last_pos);
+        
+        new_agent.has_infected = agent.has_infected;
 
         this.r_list.push(new_agent);        
         this.space.add_agent(new_agent, new_agent.position);
@@ -128,6 +132,8 @@ class SIR_Model {
         // add new
         var new_agent = new Infected(agent.unique_id, agent.position, this, 
           agent.now_in_center, agent.last_pos, agent.steps_since_infection);
+        
+        new_agent.has_infected = agent.has_infected;
 
         this.i_list.push(new_agent);        
         this.space.add_agent(new_agent, new_agent.position);
@@ -143,10 +149,8 @@ class SIR_Model {
         var add_r, add_i = this.s_list[key].step(); // if class change -> no move
         if (add_r >= 0) {
           to_r.push(add_r);
-
         } else if (add_i >= 0) {
           to_i.push(add_i);
-
         }
       }
       
@@ -183,7 +187,7 @@ class SIR_Model {
       }
 
       // return for statistics
-      return this.i_list.length - to_r.length
+      return this.i_list.length
     }
       
     step_r() {
@@ -197,6 +201,54 @@ class SIR_Model {
       return this.r_list.length
     }
 
+    /* // first try
+    calculate_R0(count_susceptible, count_infected, count_removed) {
+      // Todo: Basic reproduction number implementieren - https://web.stanford.edu/~jhj1/teachingdocs/Jones-Epidemics050308.pdf, https://wwwnc.cdc.gov/eid/article/25/1/17-1901_article
+      // R0 = βN / ν : β effective contact rate, ν removal rate; dr/dt = νi ; i = I/N, ds/dt = −βsi      
+      var i = count_infected / this.population;
+      var s = count_susceptible / this.population;
+      var r = count_removed / this.population;
+
+      var drdt = (count_removed - this.old_R.slice(-1)[0] + 0.01) / this.population;
+      var dsdt = (count_susceptible - this.old_S.slice(-1)[0] + 0.01) / this.population;
+
+      var beta = - 1/(s*i) * dsdt;
+      var ny = 1/i * drdt;
+      
+      this.old_R.push(count_removed);
+      this.old_S.push(count_susceptible);
+      this.old_I.push(count_infected);
+
+      return (beta * this.population / ny)
+    }
+    */
+    
+    calculate_R0(count_susceptible, count_infected, count_removed) {
+      // Todo: Basic reproduction number implementieren - https://web.stanford.edu/~jhj1/teachingdocs/Jones-Epidemics050308.pdf, https://wwwnc.cdc.gov/eid/article/25/1/17-1901_article
+      // R0 = βN / ν : β effective contact rate, ν removal rate; dr/dt = νi ; i = I/N, ds/dt = −βsi - https://en.wikipedia.org/wiki/Compartmental_models_in_epidemiology   
+
+      var dIdt = (6 * count_infected - this.old_I.slice(-3)[0] - 2 * this.old_I.slice(-3)[1] - 3 * this.old_I.slice(-3)[2]) / 6; // average over last 3
+      var dRdt = (6 * count_removed - this.old_R.slice(-3)[0] - 2 * this.old_R.slice(-3)[1] - 3 * this.old_R.slice(-3)[2]) / 6; // average
+      console.log("dRdT:"+dRdt+"; dIdT:"+ dIdt);
+      var gamma = (dRdt + 0.01)/count_infected;
+
+      this.old_R.push(count_removed);
+      this.old_S.push(count_susceptible);
+      this.old_I.push(count_infected);
+
+      return (( (dIdt + 0.01) /(gamma*count_infected) + 1) * this.population / count_susceptible)
+    }
+
+    /* measurement directly is hard - which group to be under survaillance? till when?
+    measure_R(count_infected_old) {
+      // es fehlt bezug zu zeitschritt - menge an infizierten beim letzten Schritt oder zu beginn
+      // get has infected of each agent and divide by infected - only active ? I, Sw/I - or with R?
+      var infections
+
+      return ( 1/count_infected_old)
+    }
+    */
+
     step() {
       var num_sus = this.step_s()
       var num_inf = this.step_i()
@@ -207,35 +259,34 @@ class SIR_Model {
       console.log("Susceptible with Infection:" + num_sus[1]);
       console.log("Identified Infected:" + num_inf);
       console.log("Removed - Recovered:" + num_rem);
-      console.log("Basic Reproduction Number:" + "todo");
 
-      // DEBUG Movement:
-      /*
-      var current_world = this.space.world;
-      console.log("printing step: "+ num)
-      for(var i = 0; i < current_world.length; i++) {
-        for(var z = 0; z < current_world.length; z++) {
-          console.log(current_world[z][i]);
-        }
+      var curr_R0 = this.calculate_R0(num_sus[0], (num_inf + num_sus[1]), num_rem);
+      this.R_array.push(curr_R0);
+      console.log("Basic Reproduction Number (current):" + curr_R0);
+      var R0_mean = this.R_array.slice(-10).reduce(function(pv, cv) { return pv + cv; }, 0) / this.R_array.slice(-10).length;
+      console.log("Basic Reproduction Number (mean, last 10):" + R0_mean);
+
+      if (num_inf + num_sus[1] == 0) {
+        return true;
+      } else {
+        return false;
       }
-      */
     }
-
 
     // remove sleep - regelmäßiges aufrufen - step methoden bei aufruf
     async run() {
       this.reset()
       this.initialize()
       for (var i of range(1, this.max_step)) {
-        console.log("step"+i);
+        console.log("Step: "+i);
         
-        this.step()
-        // world state - > from 
-        // this.s_list = [];
-        // this.r_list = [];
-        // this.i_list = [];
+         var ret = this.step()
+         if (ret) {
+          console.log("Reached end of Simulation after "+i+"steps.");
+          break
+         }
 
-        await Sleep(500);
+        await Sleep(200);
       }
     }
   }

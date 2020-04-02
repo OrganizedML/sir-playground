@@ -13,7 +13,6 @@ class Space {
         var info = [1, agent.unique_id];
 
         if (agent.position == position) {
-
             this.world[position[0]][position[1]] = info;
             this.agent_list.push([agent.unique_id, position])
 
@@ -26,23 +25,16 @@ class Space {
 
         if (agent.unique_id !== "undefined") {
             this.world[agent.position[0]][agent.position[1]] = [0, 0];
-            
             var filtered = this.agent_list.filter(function(value, index, arr){ return value[0] != agent.unique_id;});
 
-            if (filtered.length == 1) {
-                
+            if (filtered.length == (this.agent_list.length - 1)) {
                 this.agent_list = filtered;
 
             } else {
-
-                console.log("Error removing agent from world. UID not found")
-
+                console.log("Error removing agent from world. UID not valid")
             }
-
         } else {
-
             console.log("Error setting up new agents")
-
         }
     }
 
