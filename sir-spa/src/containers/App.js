@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Dummy } from "model/dummy";
+import { SIR_Model } from "model/Model";
 import {
   AppBar,
   Toolbar,
@@ -14,11 +14,12 @@ import {
 } from "@material-ui/core";
 import { PixiRenderer } from "components/PixiRenderer";
 
+let interval = null;
+let model = null;
+
 function App() {
-
-  console.log("render parent");
-
-  const [gameState, setGameState] = useState({ status: "stopped" });
+  const [agentList, setAgentList] = useState([])
+  const [gameState, setGameState] = useState("stopped");
   const [initialInfected, setInitialInfected] = useState(1);
   const [initialSuspectible, setInitialSuspectible] = useState(25);
   const [probabilityRecognized, setProbabilityRecognized] = useState(0.1);
@@ -26,11 +27,31 @@ function App() {
   const [spreadProbability, setSpreadProbability] = useState(0.3);
   const [profile, setProfile] = useState("unrestricted");
 
-  useEffect(() => {
-    let dummy = new Dummy(800, 600)
-    dummy.doSomething() 
-  })
+  const updateModel = () => {
+    model.step();
+    let newAgentList = []
+    let newSList = model.s_list.map((agent) => {
+      agent.state = "susceptible"
+      return agent
+    })
+    newAgentList.push(...newSList)
 
+    let newIList = model.i_list.map((agent) => {
+      agent.state = "infected"
+      return agent
+    })
+    newAgentList.push(...newIList)
+
+    let newRList = model.r_list.map((agent) => {
+      agent.state = "removed"
+      return agent
+    })
+    newAgentList.push(...newRList)
+
+
+    setAgentList(newAgentList)
+
+  };
 
   return (
     <Box display="flex" flexDirection="column" className="App" height="100%">
@@ -134,22 +155,52 @@ function App() {
                   <MenuItem value={"meet_friends"}>Meet Friends</MenuItem>
                 </Select>
                 <Box mt={2}>
-                <Button
-                  fullWidth
-                  color="primary"
-                  variant="contained"
-                  size="large"
-                  onClick={() => {
-                    setGameState({ status: "running" });
-                  }}
-                >
-                  Start
-                </Button>
+                  <Button
+                    color="primary"
+                    variant="contained"
+                    size="large"
+                    onClick={() => {
+                      if (gameState == "running") {
+                        setGameState("paused");
+                        clearInterval(interval);
+                      } else {
+                        setGameState("running");
+                        if (gameState == "stopped") {
+                          model = new SIR_Model(
+                            initialSuspectible,
+                            initialInfected,
+                            infectionRadius,
+                            spreadProbability,
+                            10,
+                            probabilityRecognized,
+                            200
+                          );
+                          model.reset()
+                          model.initialize();
+                        }
+                        interval = setInterval(updateModel, 1000);
+                      }
+                    }}
+                  >
+                    {gameState == "running" ? "Pause" : "Start"}
+                  </Button>
+                  &nbsp;&nbsp;
+                  <Button
+                    color="primary"
+                    variant="contained"
+                    size="large"
+                    onClick={() => {
+                      setGameState("stopped");
+                      clearInterval(interval);
+                    }}
+                  >
+                    Reset
+                  </Button>
                 </Box>
               </Box>
             </Grid>
             <Grid item xs={8}>
-              <PixiRenderer gameState={gameState} />
+              <PixiRenderer agentList={agentList} />
             </Grid>
           </Grid>
         </Container>
