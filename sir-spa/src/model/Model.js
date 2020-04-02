@@ -4,6 +4,16 @@ import { Infected } from "model/agents/I-agent"
 import { Space } from "model/Space"
 
 // Todo: movement grid -> continuous
+// distanzen - kontinuerliche längenangaben.
+
+// zeit realer zeitschritt - realistische geschwindigkeit
+// -> energy / life movement
+
+// points of interes für agenten - ziele für agenten
+// hotspot: einkaufen/arbeit/wohnort
+
+// potentialfelder - je typ
+// zeitlich anderes verhalten? hotspots aktiv - option nicht default
 
 class SIR_Model {
   // agent based SIR-Model
@@ -27,8 +37,8 @@ class SIR_Model {
       this.max_step = max_step;
       this.movement = "random";
 
-      this.width = 50
-      this.height = 50
+      this.width = 50;
+      this.height = 50;
     }
 
     reset() {
