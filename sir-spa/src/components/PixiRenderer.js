@@ -29,8 +29,8 @@ const PixiRenderer = React.memo(({ agentList }) => {
         sprite = agents[agent.unique_id];
       } else {
         sprite = new PIXI.Sprite(susceptibleTex);
-        sprite.width = 600/20
-        sprite.height = 600/20
+        sprite.width = 600/50
+        sprite.height = 600/50
         app.stage.addChild(sprite);
         agents[agent.unique_id] = sprite;
       }
@@ -41,8 +41,8 @@ const PixiRenderer = React.memo(({ agentList }) => {
       } else if (agent.state == "susceptible") {
         sprite.texture = susceptibleTex;
       }
-      sprite.x = agent.position[0] * (600 / 20);
-      sprite.y = agent.position[1] * (600 / 20);
+      sprite.x = agent.position[0] * (600 / 50);
+      sprite.y = agent.position[1] * (600 / 50);
     });
   }
 
@@ -85,7 +85,7 @@ const PixiRenderer = React.memo(({ agentList }) => {
     let gr = new PIXI.Graphics();
     gr.beginFill(0x000000);
     gr.lineStyle(0);
-    gr.drawCircle(600/20, 600/20, 600/20);
+    gr.drawCircle(600/50, 600/50, 600/50);
     gr.endFill();
 
     susceptibleTex = app.renderer.generateTexture(gr);
@@ -93,7 +93,7 @@ const PixiRenderer = React.memo(({ agentList }) => {
     gr = new PIXI.Graphics();
     gr.beginFill(0xff0000);
     gr.lineStyle(0);
-    gr.drawCircle(600/20, 600/20, 600/20);
+    gr.drawCircle(600/50, 600/50, 600/50);
     gr.endFill();
 
     infectedTex = app.renderer.generateTexture(gr);
@@ -101,7 +101,7 @@ const PixiRenderer = React.memo(({ agentList }) => {
     gr = new PIXI.Graphics();
     gr.beginFill(0x00ff00);
     gr.lineStyle(0);
-    gr.drawCircle(600/20, 600/20, 600/20);
+    gr.drawCircle(600/50, 600/50, 600/50);
     gr.endFill();
 
     recoveredTex = app.renderer.generateTexture(gr);
