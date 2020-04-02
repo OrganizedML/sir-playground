@@ -36,6 +36,8 @@ class Susceptible extends Agent {
                 this.steps_since_infection += 1;
             }
         }
+        
+        this.move()
                 
         // interact with admin
         return to_r, to_i
