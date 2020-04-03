@@ -12,8 +12,9 @@ class Space {
 
         // potential fields
         this.attractive_points = [[Math.floor(this.width/2), Math.floor(this.width/2), 1]]; // middle of grid as attractive force
-        this.repulsion_force = 0;
-        this.repulsion_range = 1;
+        this.repulsion_force_multiplier = 1;
+        this.lc = [...Array(this.height)].map(x=>Array(this.width).fill(-1))  
+        this.ll = [-1];
     }
 
 
@@ -36,21 +37,28 @@ class Space {
     }
 
     get_potential_force(agent) {
-        var force_x = 0;
-        var force_y = 0;
+        var force_x_rep = 0;
+        var force_y_rep = 0;
+        var force_x_att = 0;
+        var force_y_att = 0;
 
-        var uid_list = this.inRange_linked_cell(agent.position, agent.unique_id, agent.model.movement_range); // range == infection range for movement
+        var uid_list = this.inRange_linked_cell(agent.position, agent.unique_id, agent.model.repulsion_range); // range == infection range for movement
         var pos = this.get_local_repulsion_positions(uid_list);
-        /*
-        for (p of pos) {
+        
+        for (var p of pos) {
+            var dist = distance(agent.position, p);
+            var U_grad_rep = this.repulsion_force_multiplier / Math.pow(dist, 2) *(1 / dist - 1/ this.repulsion_range);
+            
+            force_x_rep += - U_grad_rep * (agent.position[0] - p[0]) / dist;
+            force_y_rep +=  -U_grad_rep * (agent.position[1] - p[1]) / dist;
+        }
 
-        }
-        */
+        // normalize?        
         for (var att of this.attractive_points) { //-\nabla U_{att}(\mathbf{x}) = -\alpha (\mathbf{x}-\mathbf{x_{goal}})  
-            force_x += - att[1] * (agent.position[0] - att[0]);
-            force_y += - att[1] * (agent.position[1] - att[1]);
+            force_x_att += - att[1] * (agent.position[0] - att[0]);
+            force_y_att += - att[1] * (agent.position[1] - att[1]);
         }
-        return [force_x, force_y]
+        return [force_x_att + force_x_rep, force_y_att + force_y_rep]
     }
 
     reset_linked_cell() {
@@ -92,9 +100,11 @@ class Space {
         var next;
 
         next = this.lc[nx][ny]; // index des ersten atoms auslesen
-        while (this.ll[next][0] != -1) { //solange atome in Zelle nx, ny
-            if (uid != this.ll[next][1]) {
-                uids_inRange.push(this.ll[next][1]); // add uid to list
+        if (next >= 0) {
+            while (this.ll[next][0] != -1) { //solange atome in Zelle nx, ny
+                if (uid != this.ll[next][1]) {
+                    uids_inRange.push(this.ll[next][1]); // add uid to list
+                }
             }
         }
 
@@ -222,6 +232,10 @@ function range(start, end) {
         ans.push(i);
     }
     return ans;
+}
+
+function distance(array1, array2) {
+    return Math.sqrt(Math.pow(array1[0] - array2[0], 2) + Math.pow(array1[1] - array2[1], 2));
 }
 
 export {Space}

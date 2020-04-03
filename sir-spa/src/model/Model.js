@@ -38,7 +38,7 @@ class SIR_Model {
       this.steps_till_symptoms = 2;
       this.max_step = max_step;
       this.movement = "random";
-      this.movement_range = 1;
+      this.repulsion_range = 2;
 
       this.width = 50;
       this.height = 50;
@@ -237,7 +237,7 @@ class SIR_Model {
 
 
     step() {
-      this.space.update_linked_cell(this.movement_range);
+      this.space.update_linked_cell(this.repulsion_range);
 
       // step for each class
       var num_sus = this.step_s()
