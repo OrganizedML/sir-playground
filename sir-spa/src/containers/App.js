@@ -19,49 +19,53 @@ let interval = null;
 let model = null;
 
 function App() {
-  const [agentList, setAgentList] = useState([])
+  // For rendering
+  const [agentList, setAgentList] = useState([]);
+  const [worldWidth, setWorldWidth] = useState(undefined);
+  const [worldHeight, setWorldHeight] = useState(undefined);
+
+  // Configuration
   const [gameState, setGameState] = useState("stopped");
   const [initialInfected, setInitialInfected] = useState(5);
   const [initialSuspectible, setInitialSuspectible] = useState(200);
   const [probabilityRecognized, setProbabilityRecognized] = useState(0.3);
   const [infectionRadius, setInfectionRadius] = useState(2);
   const [spreadProbability, setSpreadProbability] = useState(0.2);
-  const [infectionDuration, setInfectionDuration] = useState(10)
+  const [infectionDuration, setInfectionDuration] = useState(10);
   const [profile, setProfile] = useState("unrestricted");
-  const [stepDuration, setStepDuration] = useState(0.5)
+  const [stepDuration, setStepDuration] = useState(0.5);
 
   const updateModel = () => {
     let isSimulationEnd = model.step();
-    let newAgentList = []
-    let newSList = model.s_list.map((agent) => {
+    let newAgentList = [];
+    let newSList = model.s_list.map(agent => {
       if (agent.infected === true) {
-        agent.state = "infected_unrecognized"
+        agent.state = "infected_unrecognized";
       } else {
-        agent.state = "susceptible"
+        agent.state = "susceptible";
       }
-      
-      return agent
-    })
 
-    newAgentList.push(...newSList)
+      return agent;
+    });
 
-    let newIList = model.i_list.map((agent) => {
-      agent.state = "infected"
-      return agent
-    })
-    newAgentList.push(...newIList)
+    newAgentList.push(...newSList);
 
-    let newRList = model.r_list.map((agent) => {
-      agent.state = "recovered"
-      return agent
-    })
-    newAgentList.push(...newRList)
+    let newIList = model.i_list.map(agent => {
+      agent.state = "infected";
+      return agent;
+    });
+    newAgentList.push(...newIList);
 
+    let newRList = model.r_list.map(agent => {
+      agent.state = "recovered";
+      return agent;
+    });
+    newAgentList.push(...newRList);
 
-    setAgentList(newAgentList)
+    setAgentList(newAgentList);
     if (isSimulationEnd) {
-      clearInterval(interval)
-      setGameState("stopped")
+      clearInterval(interval);
+      setGameState("stopped");
     }
   };
 
@@ -147,7 +151,7 @@ function App() {
                     setSpreadProbability(newValue);
                   }}
                 />
-                
+
                 <Typography variant="overline" gutterBottom>
                   Mean Infection Duration
                 </Typography>
@@ -162,8 +166,6 @@ function App() {
                     setInfectionDuration(newValue);
                   }}
                 />
-
-                
 
                 <Typography variant="overline" gutterBottom>
                   Profile
@@ -183,7 +185,7 @@ function App() {
                   </MenuItem>
                   <MenuItem value={"meet_friends"}>Meet Friends</MenuItem>
                 </Select>
-                <Divider/>
+                <Divider />
                 <Typography variant="overline" gutterBottom>
                   Step Period (s)
                 </Typography>
@@ -219,10 +221,17 @@ function App() {
                             probabilityRecognized,
                             999999999999
                           );
-                          model.reset()
+
+                          model.reset();
                           model.initialize();
+                          setWorldHeight(model.height);
+                          setWorldWidth(model.width);
                         }
-                        interval = setInterval(updateModel, stepDuration * 1000);
+
+                        interval = setInterval(
+                          updateModel,
+                          stepDuration * 1000
+                        );
                       }
                     }}
                   >
@@ -244,7 +253,11 @@ function App() {
               </Box>
             </Grid>
             <Grid item xs={8}>
-              <PixiRenderer agentList={agentList} worldWidth={model && model.width} worldHeight={model && model.height} />
+              <PixiRenderer
+                agentList={agentList}
+                worldWidth={worldWidth}
+                worldHeight={worldWidth}
+              />
             </Grid>
           </Grid>
         </Container>

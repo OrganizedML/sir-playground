@@ -11,16 +11,20 @@ let app;
 const renderWidth = 600;
 const renderHeight = 600;
 
-const PixiRenderer = React.memo(({ agentList, worldWidth, worldHeight }) => {
+const PixiRenderer = React.memo(({ agentList, worldWidth, worldHeight, stepDuration }) => {
   const stageContainer = useRef(null);
 
   Object.keys(agents).forEach(unique_id => {
+    
     let index = agentList.findIndex(agent => {
-      return agent.unique_id === unique_id;
+      
+      return agent.unique_id == unique_id;
     });
     if (index === -1) {
       app.stage.removeChild(agents[unique_id]);
       delete agents[unique_id];
+    } else {
+      agents[unique_id].agent = agentList[index]
     }
   });
 
@@ -28,13 +32,13 @@ const PixiRenderer = React.memo(({ agentList, worldWidth, worldHeight }) => {
     agentList.forEach(agent => {
       let sprite;
       if (agent.unique_id in agents) {
-        sprite = agents[agent.unique_id];
+        sprite = agents[agent.unique_id].sprite;
       } else {
         sprite = new PIXI.Sprite(susceptibleTex);
         sprite.width = renderWidth / worldWidth;
         sprite.height = renderHeight / worldHeight;
         app.stage.addChild(sprite);
-        agents[agent.unique_id] = sprite;
+        agents[agent.unique_id] = {sprite: sprite, agent: agent};
       }
       if (agent.state == "infected") {
         sprite.texture = infectedTex;
