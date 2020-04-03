@@ -74,19 +74,20 @@ class Space {
             var nx = Math.floor(agent[1][0] / range);
             var ny = Math.floor(agent[1][1] / range);
 
-            this.ll[n] = [this.lc[nx][ny], agent.unique_id]; // ll list hast index for linked cell method and uid
+            this.ll[n] = [this.lc[nx][ny], agent[0]]; // ll list hast index for linked cell method and uid
             this.lc[nx][ny] = n;
             n++;
         }
     }
 
     uids_in_cell_linked_cell(nx,ny) {
-        var uids = []
+        var uids = [];
         var next;
 
         next = this.lc[nx][ny]; // index des ersten atoms auslesen
         while (this.ll[next][0] != -1) { //solange atome in Zelle nx, ny
             uids.push(this.ll[next][1]); // add uid to list
+            next = this.ll[next][0]; // find next agent in ll
         }
 
         return uids
@@ -96,14 +97,15 @@ class Space {
         var nx = Math.floor(current_position[0] / range);
         var ny = Math.floor(current_position[1] / range);
 
-        var uids_inRange = []
+        var uids_inRange = []; //  problem hier? array hatt 20.000 einträge
         var next;
 
-        next = this.lc[nx][ny]; // index des ersten atoms auslesen
+        next = this.lc[nx][ny]; // index des ersten agenten auslesen
         if (next >= 0) {
             while (this.ll[next][0] != -1) { //solange atome in Zelle nx, ny
                 if (uid != this.ll[next][1]) {
                     uids_inRange.push(this.ll[next][1]); // add uid to list
+                    next = this.ll[next][0]; // find next agent in ll
                 }
             }
         }
@@ -121,6 +123,7 @@ class Space {
         next = this.lc[nx][ny]; // index des ersten atoms auslesen
         while (this.ll[next][0] != -1) { //solange atome in Zelle nx, ny
             uids_inRange.push(this.ll[next][1]); // add uid to list
+            next = this.ll[next][0]; // find next agent in ll
         }
 
         return uids_inRange
