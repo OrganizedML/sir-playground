@@ -31,7 +31,7 @@ function App() {
   const [stepDuration, setStepDuration] = useState(0.5)
 
   const updateModel = () => {
-    model.step();
+    let isSimulationEnd = model.step();
     let newAgentList = []
     let newSList = model.s_list.map((agent) => {
       if (agent.infected === true) {
@@ -59,7 +59,10 @@ function App() {
 
 
     setAgentList(newAgentList)
-
+    if (isSimulationEnd) {
+      clearInterval(interval)
+      setGameState("stopped")
+    }
   };
 
   return (
