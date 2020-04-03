@@ -3,6 +3,8 @@ import { Removed } from "model/agents/R-agent"
 import { Infected } from "model/agents/I-agent"
 import { Space } from "model/Space"
 
+// Bugs - Reset LL, model reset -> world reset
+
 // Todo: movement grid -> continuous
 // distanzen - kontinuerliche längenangaben.
 
