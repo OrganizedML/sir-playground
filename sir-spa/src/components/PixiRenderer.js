@@ -8,13 +8,15 @@ let infectedTex;
 let infectedUnrecognizedTex;
 let recoveredTex;
 let app;
+const renderWidth = 600;
+const renderHeight = 600;
 
-const PixiRenderer = React.memo(({ agentList }) => {
+const PixiRenderer = React.memo(({ agentList, worldWidth, worldHeight }) => {
   const stageContainer = useRef(null);
 
   Object.keys(agents).forEach(unique_id => {
     let index = agentList.findIndex(agent => {
-      return agent.unique_id == unique_id;
+      return agent.unique_id === unique_id;
     });
     if (index === -1) {
       app.stage.removeChild(agents[unique_id]);
@@ -29,23 +31,22 @@ const PixiRenderer = React.memo(({ agentList }) => {
         sprite = agents[agent.unique_id];
       } else {
         sprite = new PIXI.Sprite(susceptibleTex);
-        sprite.width = 600 / 50;
-        sprite.height = 600 / 50;
+        sprite.width = renderWidth / worldWidth;
+        sprite.height = renderHeight / worldHeight;
         app.stage.addChild(sprite);
         agents[agent.unique_id] = sprite;
       }
       if (agent.state == "infected") {
         sprite.texture = infectedTex;
       } else if (agent.state == "infected_unrecognized") {
-        console.log("aaaaaaaaa")
         sprite.texture = infectedUnrecognizedTex;
       } else if (agent.state == "recovered") {
         sprite.texture = recoveredTex;
       } else if (agent.state == "susceptible") {
         sprite.texture = susceptibleTex;
       }
-      sprite.x = agent.position[0] * (600 / 50);
-      sprite.y = agent.position[1] * (600 / 50);
+      sprite.x = agent.position[0] * (renderWidth / worldWidth);
+      sprite.y = agent.position[1] * (renderHeight / worldHeight);
     });
   }
 
@@ -77,18 +78,27 @@ const PixiRenderer = React.memo(({ agentList }) => {
   // }
 
   useEffect(() => {
-    app = new PIXI.Application({
-      width: 600,
-      height: 600,
-      transparent: true
-    });
+    if (!worldHeight || !worldWidth) {
+      return;
+    }
+    if (!app) {
+      app = new PIXI.Application({
+        width: renderWidth,
+        height: renderHeight,
+        transparent: true
+      });
+    }
 
     stageContainer.current.appendChild(app.view);
 
     let gr = new PIXI.Graphics();
     gr.beginFill(0x000000);
     gr.lineStyle(0);
-    gr.drawCircle(600 / 50, 600 / 50, 600 / 50);
+    gr.drawCircle(
+      renderWidth / worldWidth,
+      renderHeight / worldHeight,
+      Math.min(renderWidth / worldWidth, renderHeight / worldHeight)
+    );
     gr.endFill();
 
     susceptibleTex = app.renderer.generateTexture(gr);
@@ -96,7 +106,11 @@ const PixiRenderer = React.memo(({ agentList }) => {
     gr = new PIXI.Graphics();
     gr.beginFill(0xff0000);
     gr.lineStyle(0);
-    gr.drawCircle(600 / 50, 600 / 50, 600 / 50);
+    gr.drawCircle(
+      renderWidth / worldWidth,
+      renderHeight / worldHeight,
+      Math.min(renderWidth / worldWidth, renderHeight / worldHeight)
+    );
     gr.endFill();
 
     infectedTex = app.renderer.generateTexture(gr);
@@ -104,7 +118,11 @@ const PixiRenderer = React.memo(({ agentList }) => {
     gr = new PIXI.Graphics();
     gr.beginFill(0x0000ff);
     gr.lineStyle(0);
-    gr.drawCircle(600 / 50, 600 / 50, 600 / 50);
+    gr.drawCircle(
+      renderWidth / worldWidth,
+      renderHeight / worldHeight,
+      Math.min(renderWidth / worldWidth, renderHeight / worldHeight)
+    );
     gr.endFill();
 
     infectedUnrecognizedTex = app.renderer.generateTexture(gr);
@@ -112,11 +130,15 @@ const PixiRenderer = React.memo(({ agentList }) => {
     gr = new PIXI.Graphics();
     gr.beginFill(0x00ff00);
     gr.lineStyle(0);
-    gr.drawCircle(600 / 50, 600 / 50, 600 / 50);
+    gr.drawCircle(
+      renderWidth / worldWidth,
+      renderHeight / worldHeight,
+      Math.min(renderWidth / worldWidth, renderHeight / worldHeight)
+    );
     gr.endFill();
 
     recoveredTex = app.renderer.generateTexture(gr);
-  }, []);
+  }, [worldHeight, worldWidth]);
 
   return <div ref={stageContainer}></div>;
 });

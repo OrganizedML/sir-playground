@@ -10,7 +10,8 @@ import {
   Slider,
   MenuItem,
   Select,
-  Button
+  Button,
+  Divider
 } from "@material-ui/core";
 import { PixiRenderer } from "components/PixiRenderer";
 
@@ -27,6 +28,7 @@ function App() {
   const [spreadProbability, setSpreadProbability] = useState(0.2);
   const [infectionDuration, setInfectionDuration] = useState(10)
   const [profile, setProfile] = useState("unrestricted");
+  const [stepDuration, setStepDuration] = useState(0.5)
 
   const updateModel = () => {
     model.step();
@@ -158,7 +160,7 @@ function App() {
                   }}
                 />
 
-
+                
 
                 <Typography variant="overline" gutterBottom>
                   Profile
@@ -178,6 +180,21 @@ function App() {
                   </MenuItem>
                   <MenuItem value={"meet_friends"}>Meet Friends</MenuItem>
                 </Select>
+                <Divider/>
+                <Typography variant="overline" gutterBottom>
+                  Step Period (s)
+                </Typography>
+                <Slider
+                  valueLabelDisplay="auto"
+                  step={0.1}
+                  marks
+                  min={0.1}
+                  max={2.0}
+                  value={stepDuration}
+                  onChange={(event, newValue) => {
+                    setStepDuration(newValue);
+                  }}
+                />
                 <Box mt={2}>
                   <Button
                     color="primary"
@@ -202,7 +219,7 @@ function App() {
                           model.reset()
                           model.initialize();
                         }
-                        interval = setInterval(updateModel, 1000);
+                        interval = setInterval(updateModel, stepDuration * 1000);
                       }
                     }}
                   >
@@ -224,7 +241,7 @@ function App() {
               </Box>
             </Grid>
             <Grid item xs={8}>
-              <PixiRenderer agentList={agentList} />
+              <PixiRenderer agentList={agentList} worldWidth={model && model.width} worldHeight={model && model.height} />
             </Grid>
           </Grid>
         </Container>
