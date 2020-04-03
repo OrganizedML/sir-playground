@@ -171,14 +171,14 @@ function App() {
                             initialInfected,
                             infectionRadius,
                             spreadProbability,
-                            10,
+                            20,
                             probabilityRecognized,
                             200
                           );
                           model.reset()
                           model.initialize();
                         }
-                        interval = setInterval(updateModel, 1000);
+                        interval = setInterval(updateModel, 100);
                       }
                     }}
                   >
