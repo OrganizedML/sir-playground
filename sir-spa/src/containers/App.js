@@ -20,20 +20,27 @@ let model = null;
 function App() {
   const [agentList, setAgentList] = useState([])
   const [gameState, setGameState] = useState("stopped");
-  const [initialInfected, setInitialInfected] = useState(1);
-  const [initialSuspectible, setInitialSuspectible] = useState(25);
-  const [probabilityRecognized, setProbabilityRecognized] = useState(0.1);
-  const [infectionRadius, setInfectionRadius] = useState(1);
-  const [spreadProbability, setSpreadProbability] = useState(0.3);
+  const [initialInfected, setInitialInfected] = useState(5);
+  const [initialSuspectible, setInitialSuspectible] = useState(200);
+  const [probabilityRecognized, setProbabilityRecognized] = useState(0.3);
+  const [infectionRadius, setInfectionRadius] = useState(2);
+  const [spreadProbability, setSpreadProbability] = useState(0.2);
+  const [infectionDuration, setInfectionDuration] = useState(10)
   const [profile, setProfile] = useState("unrestricted");
 
   const updateModel = () => {
     model.step();
     let newAgentList = []
     let newSList = model.s_list.map((agent) => {
-      agent.state = "susceptible"
+      if (agent.infected === true) {
+        agent.state = "infected_unrecognized"
+      } else {
+        agent.state = "susceptible"
+      }
+      
       return agent
     })
+
     newAgentList.push(...newSList)
 
     let newIList = model.i_list.map((agent) => {
@@ -80,14 +87,14 @@ function App() {
                   }}
                 />
                 <Typography variant="overline" gutterBottom>
-                  Initial Suspectible
+                  Population
                 </Typography>
                 <Slider
                   valueLabelDisplay="auto"
                   step={25}
                   marks
                   min={25}
-                  max={200}
+                  max={500}
                   value={initialSuspectible}
                   onChange={(event, newValue) => {
                     setInitialSuspectible(newValue);
@@ -115,7 +122,7 @@ function App() {
                   step={1}
                   marks
                   min={1}
-                  max={3}
+                  max={5}
                   value={infectionRadius}
                   onChange={(event, newValue) => {
                     setInfectionRadius(newValue);
@@ -135,6 +142,23 @@ function App() {
                     setSpreadProbability(newValue);
                   }}
                 />
+                
+                <Typography variant="overline" gutterBottom>
+                  Mean Infection Duration
+                </Typography>
+                <Slider
+                  valueLabelDisplay="auto"
+                  step={5}
+                  marks
+                  min={5}
+                  max={15}
+                  value={infectionDuration}
+                  onChange={(event, newValue) => {
+                    setInfectionDuration(newValue);
+                  }}
+                />
+
+
 
                 <Typography variant="overline" gutterBottom>
                   Profile
@@ -171,9 +195,9 @@ function App() {
                             initialInfected,
                             infectionRadius,
                             spreadProbability,
-                            10,
+                            infectionDuration,
                             probabilityRecognized,
-                            200
+                            999999999999
                           );
                           model.reset()
                           model.initialize();

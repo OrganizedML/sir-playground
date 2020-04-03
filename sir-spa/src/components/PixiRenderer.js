@@ -5,22 +5,22 @@ import BunnyImage from "./bunny.png";
 const agents = {};
 let susceptibleTex;
 let infectedTex;
+let infectedUnrecognizedTex;
 let recoveredTex;
-let app
+let app;
 
 const PixiRenderer = React.memo(({ agentList }) => {
   const stageContainer = useRef(null);
 
-  Object.keys(agents).forEach((unique_id) => {
-    let index = agentList.findIndex((agent) => {
-      return agent.unique_id == unique_id
-    })
+  Object.keys(agents).forEach(unique_id => {
+    let index = agentList.findIndex(agent => {
+      return agent.unique_id == unique_id;
+    });
     if (index === -1) {
-      app.stage.removeChild(agents[unique_id])
-      delete agents[unique_id]
+      app.stage.removeChild(agents[unique_id]);
+      delete agents[unique_id];
     }
-  })
-
+  });
 
   if (app && agentList) {
     agentList.forEach(agent => {
@@ -29,13 +29,16 @@ const PixiRenderer = React.memo(({ agentList }) => {
         sprite = agents[agent.unique_id];
       } else {
         sprite = new PIXI.Sprite(susceptibleTex);
-        sprite.width = 600/50
-        sprite.height = 600/50
+        sprite.width = 600 / 50;
+        sprite.height = 600 / 50;
         app.stage.addChild(sprite);
         agents[agent.unique_id] = sprite;
       }
       if (agent.state == "infected") {
         sprite.texture = infectedTex;
+      } else if (agent.state == "infected_unrecognized") {
+        console.log("aaaaaaaaa")
+        sprite.texture = infectedUnrecognizedTex;
       } else if (agent.state == "recovered") {
         sprite.texture = recoveredTex;
       } else if (agent.state == "susceptible") {
@@ -79,13 +82,13 @@ const PixiRenderer = React.memo(({ agentList }) => {
       height: 600,
       transparent: true
     });
-    
+
     stageContainer.current.appendChild(app.view);
 
     let gr = new PIXI.Graphics();
     gr.beginFill(0x000000);
     gr.lineStyle(0);
-    gr.drawCircle(600/50, 600/50, 600/50);
+    gr.drawCircle(600 / 50, 600 / 50, 600 / 50);
     gr.endFill();
 
     susceptibleTex = app.renderer.generateTexture(gr);
@@ -93,15 +96,23 @@ const PixiRenderer = React.memo(({ agentList }) => {
     gr = new PIXI.Graphics();
     gr.beginFill(0xff0000);
     gr.lineStyle(0);
-    gr.drawCircle(600/50, 600/50, 600/50);
+    gr.drawCircle(600 / 50, 600 / 50, 600 / 50);
     gr.endFill();
 
     infectedTex = app.renderer.generateTexture(gr);
 
     gr = new PIXI.Graphics();
+    gr.beginFill(0x0000ff);
+    gr.lineStyle(0);
+    gr.drawCircle(600 / 50, 600 / 50, 600 / 50);
+    gr.endFill();
+
+    infectedUnrecognizedTex = app.renderer.generateTexture(gr);
+
+    gr = new PIXI.Graphics();
     gr.beginFill(0x00ff00);
     gr.lineStyle(0);
-    gr.drawCircle(600/50, 600/50, 600/50);
+    gr.drawCircle(600 / 50, 600 / 50, 600 / 50);
     gr.endFill();
 
     recoveredTex = app.renderer.generateTexture(gr);
