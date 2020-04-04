@@ -31,7 +31,7 @@ class Susceptible extends Agent {
                 this.spread_infection();
                 // move agent
                 // this.move()
-                this.continuous_move()
+                this.hotspot_move()
                 // spread in new position
                 this.spread_infection();
                 this.steps_since_infection += 1;
@@ -40,7 +40,7 @@ class Susceptible extends Agent {
         
         // move agent
         // this.move()
-        this.continuous_move()
+        this.hotspot_move()
                 
         // interact with admin
         return to_r, to_i

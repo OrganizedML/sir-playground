@@ -38,7 +38,7 @@ class SIR_Model {
       this.steps_till_symptoms = 2;
       this.max_step = max_step;
       this.movement = "random";
-      this.repulsion_range = 2;
+      this.repulsion_range = 5;
 
       this.width = 50;
       this.height = 50;

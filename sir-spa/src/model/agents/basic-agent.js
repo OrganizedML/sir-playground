@@ -10,8 +10,8 @@ class Agent{
             this.last_pos = last_pos;
             this.has_infected = has_infected;
 
-            this.x = undefined;
-            this.y = undefined;
+            this.dx = (Math.random() - 0.5) * 2;
+            this.dy = (Math.random() - 0.5) * 2;
         }
     
     // movement
@@ -32,12 +32,17 @@ class Agent{
     }
 
     // movement
-    continuous_move() {
+    hotspot_move() {
         var empyt_cells = [];
         var potForce = this.model.space.get_potential_force(this);
         // todo normalize?
-        potForce = normalize_2D(potForce);
+        potForce[0] += this.dx + (Math.random() - 0.5) * 2;
+        potForce[1] += this.dy + (Math.random() - 0.5) * 2;
         
+        potForce = normalize_2D(potForce);
+        this.dx = potForce[0];
+        this.dy = potForce[1];
+
         // move only in empty cell - otherwise dont move - testing - todo
         empyt_cells = this.model.space.get_neighborhood_empty(this.position);
         var new_pos = [Math.round(this.position[0] + potForce[0]), Math.round(this.position[1] + potForce[1])];
