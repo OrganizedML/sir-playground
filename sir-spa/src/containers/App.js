@@ -10,7 +10,8 @@ import {
   Slider,
   MenuItem,
   Select,
-  Button
+  Button,
+  Divider,
 } from "@material-ui/core";
 import { PixiRenderer } from "components/PixiRenderer";
 
@@ -18,39 +19,54 @@ let interval = null;
 let model = null;
 
 function App() {
-  const [agentList, setAgentList] = useState([])
+  // For rendering
+  const [agentList, setAgentList] = useState([]);
+  const [worldWidth, setWorldWidth] = useState(undefined);
+  const [worldHeight, setWorldHeight] = useState(undefined);
+
+  // Configuration
   const [gameState, setGameState] = useState("stopped");
-  const [initialInfected, setInitialInfected] = useState(1);
-  const [initialSuspectible, setInitialSuspectible] = useState(25);
-  const [probabilityRecognized, setProbabilityRecognized] = useState(0.1);
-  const [infectionRadius, setInfectionRadius] = useState(1);
-  const [spreadProbability, setSpreadProbability] = useState(0.3);
+  const [initialInfected, setInitialInfected] = useState(5);
+  const [initialSuspectible, setInitialSuspectible] = useState(200);
+  const [probabilityRecognized, setProbabilityRecognized] = useState(0.3);
+  const [infectionRadius, setInfectionRadius] = useState(2);
+  const [spreadProbability, setSpreadProbability] = useState(0.2);
+  const [infectionDuration, setInfectionDuration] = useState(10);
   const [profile, setProfile] = useState("unrestricted");
+  const [stepDuration, setStepDuration] = useState(0.5);
 
   const updateModel = () => {
-    model.step();
-    let newAgentList = []
+    let isSimulationEnd = model.step();
+    let newAgentList = [];
     let newSList = model.s_list.map((agent) => {
-      agent.state = "susceptible"
-      return agent
-    })
-    newAgentList.push(...newSList)
+      if (agent.infected === true) {
+        agent.state = "infected_unrecognized";
+      } else {
+        agent.state = "susceptible";
+      }
+
+      return Object.assign({}, agent);
+    });
+
+    newAgentList.push(...newSList);
 
     let newIList = model.i_list.map((agent) => {
-      agent.state = "infected"
-      return agent
-    })
-    newAgentList.push(...newIList)
+      agent.state = "infected";
+      return Object.assign({}, agent);
+    });
+    newAgentList.push(...newIList);
 
     let newRList = model.r_list.map((agent) => {
-      agent.state = "recovered"
-      return agent
-    })
-    newAgentList.push(...newRList)
+      agent.state = "recovered";
+      return Object.assign({}, agent);
+    });
+    newAgentList.push(...newRList);
 
-
-    setAgentList(newAgentList)
-
+    setAgentList(newAgentList);
+    if (isSimulationEnd) {
+      clearInterval(interval);
+      setGameState("stopped");
+    }
   };
 
   return (
@@ -80,14 +96,14 @@ function App() {
                   }}
                 />
                 <Typography variant="overline" gutterBottom>
-                  Initial Suspectible
+                  Population
                 </Typography>
                 <Slider
                   valueLabelDisplay="auto"
                   step={25}
                   marks
                   min={25}
-                  max={200}
+                  max={500}
                   value={initialSuspectible}
                   onChange={(event, newValue) => {
                     setInitialSuspectible(newValue);
@@ -115,7 +131,7 @@ function App() {
                   step={1}
                   marks
                   min={1}
-                  max={3}
+                  max={5}
                   value={infectionRadius}
                   onChange={(event, newValue) => {
                     setInfectionRadius(newValue);
@@ -137,6 +153,21 @@ function App() {
                 />
 
                 <Typography variant="overline" gutterBottom>
+                  Mean Infection Duration
+                </Typography>
+                <Slider
+                  valueLabelDisplay="auto"
+                  step={5}
+                  marks
+                  min={5}
+                  max={15}
+                  value={infectionDuration}
+                  onChange={(event, newValue) => {
+                    setInfectionDuration(newValue);
+                  }}
+                />
+
+                <Typography variant="overline" gutterBottom>
                   Profile
                 </Typography>
                 <br />
@@ -144,7 +175,7 @@ function App() {
                   fullWidth
                   variant="outlined"
                   value={profile}
-                  onChange={event => {
+                  onChange={(event) => {
                     setProfile(event.target.value);
                   }}
                 >
@@ -154,6 +185,21 @@ function App() {
                   </MenuItem>
                   <MenuItem value={"meet_friends"}>Meet Friends</MenuItem>
                 </Select>
+                <Divider />
+                <Typography variant="overline" gutterBottom>
+                  Step Period (s)
+                </Typography>
+                <Slider
+                  valueLabelDisplay="auto"
+                  step={0.1}
+                  marks
+                  min={0.1}
+                  max={2.0}
+                  value={stepDuration}
+                  onChange={(event, newValue) => {
+                    setStepDuration(newValue);
+                  }}
+                />
                 <Box mt={2}>
                   <Button
                     color="primary"
@@ -173,10 +219,13 @@ function App() {
                             spreadProbability,
                             20,
                             probabilityRecognized,
-                            200
+                            999999999999
                           );
-                          model.reset()
+
+                          model.reset();
                           model.initialize();
+                          setWorldHeight(model.height);
+                          setWorldWidth(model.width);
                         }
                         interval = setInterval(updateModel, 100);
                       }
@@ -200,7 +249,12 @@ function App() {
               </Box>
             </Grid>
             <Grid item xs={8}>
-              <PixiRenderer agentList={agentList} />
+              <PixiRenderer
+                agentList={agentList}
+                worldWidth={worldWidth}
+                worldHeight={worldWidth}
+                stepDuration={stepDuration}
+              />
             </Grid>
           </Grid>
         </Container>
