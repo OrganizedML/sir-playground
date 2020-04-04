@@ -24,7 +24,6 @@ const PixiRenderer = React.memo(
         app.stage.removeChild(agents[unique_id]);
         delete agents[unique_id];
       } else {
-
         agents[unique_id].oldPos = agents[unique_id].agent.position;
 
         agents[unique_id].agent = agentList[index];
@@ -34,14 +33,28 @@ const PixiRenderer = React.memo(
     if (app && agentList) {
       agentList.forEach((agent) => {
         let sprite;
+        let text;
         if (agent.unique_id in agents) {
           sprite = agents[agent.unique_id].sprite;
+          text = agents[agent.unique_id].text;
         } else {
           sprite = new PIXI.Sprite(susceptibleTex);
+
           sprite.width = renderWidth / worldWidth;
           sprite.height = renderHeight / worldHeight;
           app.stage.addChild(sprite);
+
+          text = new PIXI.Text(agent.unique_id.toString(), {
+            fontFamily: "Arial",
+            fontSize: 10,
+            fill: 0x5555ff,
+            align: "center",
+          });
+          
+          app.stage.addChild(text);
+
           agents[agent.unique_id] = {
+            text: text,
             sprite: sprite,
             agent: agent,
             oldPos: agent.position,
@@ -108,12 +121,15 @@ const PixiRenderer = React.memo(
               agentInfo.oldPos[0] * (renderWidth / worldWidth) +
               (agentInfo.agent.position[0] * (renderWidth / worldWidth) -
                 agentInfo.oldPos[0] * (renderWidth / worldWidth)) *
-                Math.min((elapsedTime / stepDuration), 1.0);
+                Math.min(elapsedTime / stepDuration, 1.0);
             agentInfo.sprite.y =
               agentInfo.oldPos[1] * (renderHeight / worldHeight) +
               (agentInfo.agent.position[1] * (renderHeight / worldHeight) -
                 agentInfo.oldPos[1] * (renderHeight / worldHeight)) *
-                Math.min((elapsedTime / stepDuration), 1.0);
+                Math.min(elapsedTime / stepDuration, 1.0);
+
+            agentInfo.text.x = agentInfo.sprite.x;
+            agentInfo.text.y = agentInfo.sprite.y + (renderHeight / worldHeight);
           });
         });
       }
