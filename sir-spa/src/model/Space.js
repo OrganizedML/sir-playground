@@ -22,7 +22,7 @@ class Space {
         this.repulsion_force_multiplier = 2;
         this.lc = [...Array(this.height)].map(x=>Array(this.width).fill(-1))  
         this.ll = new Array();
-        this.ll[0] = [-1, -1];
+        this.ll[0] = [-1, -1, [0, 0]];
     }
 
 
@@ -82,7 +82,7 @@ class Space {
     reset_linked_cell(range) {
         this.lc = [...Array(Math.floor(this.height/range)+1)].map(x=>Array(Math.floor(this.width/range)+1).fill(-1))  
         this.ll.splice(0, this.ll.length);
-        this.ll[0] = [-1, -1]
+        this.ll[0] = [-1, -1, [0, 0]];
     }
 
     update_linked_cell(range) {
@@ -93,7 +93,7 @@ class Space {
             var nx = Math.floor(agent[1][0] / range);
             var ny = Math.floor(agent[1][1] / range);
 
-            this.ll[n] = [this.lc[nx][ny], agent[0]]; // ll list hast index for linked cell method and uid
+            this.ll[n] = [this.lc[nx][ny], agent[0], agent[1]]; // ll list hast index for linked cell method and uid
             this.lc[nx][ny] = n;
             n++;
         }
@@ -112,7 +112,7 @@ class Space {
         return uids
     }
 
-    inRange_linked_cell(current_position, uid, range) {
+    inRange_linked_cell(current_position, uid, range, with_position=false) {
         var nx; 
         nx = Math.floor(current_position[0] / range);
         var ny;
@@ -125,7 +125,11 @@ class Space {
         if (next >= 0) {
             while (this.ll[next][0] != -1) { //solange atome in Zelle nx, ny
                 if (uid != this.ll[next][1]) {
-                    uids_inRange.push(this.ll[next][1]); // add uid to list
+                    if (with_position) {
+                        uids_inRange.push([this.ll[next][1], this.ll[next][2]]); // todo add position to ll
+                    } else {
+                        uids_inRange.push(this.ll[next][1]); // add uid to list
+                    }
                 }
                 next = this.ll[next][0]; // find next agent in ll
             }
@@ -134,7 +138,7 @@ class Space {
         return uids_inRange
     }
 
-    inRange_all_uids_linked_cell(current_position, range) {
+    inRange_all_uids_linked_cell(current_position, range, with_position=false) {
         var nx = Math.floor(current_position[0] / range);
         var ny = Math.floor(current_position[1] / range);
 
@@ -143,7 +147,11 @@ class Space {
 
         next = this.lc[nx][ny]; // index des ersten atoms auslesen
         while (this.ll[next][0] != -1) { //solange atome in Zelle nx, ny
-            uids_inRange.push(this.ll[next][1]); // add uid to list
+            if (with_position) {
+                uids_inRange.push([this.ll[next][1], this.ll[next][2]]); // todo add position to ll                
+            } else {
+                uids_inRange.push(this.ll[next][1]); // add uid to list
+            }
             next = this.ll[next][0]; // find next agent in ll
         }
 
@@ -213,21 +221,34 @@ class Space {
         return list
     }
 
-    get_agents_inRange(position, infection_range) {
+    get_agents_inRange(agent, infection_range) {
 
-        var list = [];
+        var list = new Array();
         // Rand ist Ende der Welt
-        for(var x of range((position[0]-infection_range), (position[0]+infection_range))) {
+        
+        for(var x of range((agent.position[0]-infection_range), (agent.position[0]+infection_range))) {
             if (x < this.width && x >= 0) {
-                for(var y of range((position[1]-infection_range), (position[1]+infection_range))) {
+                for(var y of range((agent.position[1]-infection_range), (agent.position[1]+infection_range))) {
                     if (y < this.height && y >= 0) {
-                        if (this.world[x][y][0] == 1 && [x,y] != position) {
+                        if (this.world[x][y][0] == 1 && [x,y] != agent.position) {
                             list.push(this.world[x][y][1]); // push the unique_id
                         }
                     }
                 }
             }
         }
+        
+       /*
+        // todo umbauen ohne grid zu verwenden - agent list sollte dict sein!
+        var uids_pos_repulsion = this.inRange_linked_cell(agent.position, agent.unique_id, agent.model.repulsion_range, true); // [0]: uid; [1]: position
+
+        for (var uid_pos of uids_pos_repulsion) {
+            if (distance(agent.position, uid_pos[1]) < infection_range) {
+                list.push(uid_pos[0]);
+            }
+        }
+        */
+
         // return uids of agents in range
         return list
     }

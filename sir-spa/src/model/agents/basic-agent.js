@@ -67,7 +67,7 @@ class Agent{
     }
     
     spread_infection() {
-        var agents_inRange_UIDS = this.model.space.get_agents_inRange(this.position, this.model.infection_radius);
+        var agents_inRange_UIDS = this.model.space.get_agents_inRange(this, this.model.infection_radius);
 
         for (var uid of agents_inRange_UIDS) {
             var agent = this.model.s_list.filter(function(object, index, arr){ return object.unique_id === uid;})[0];

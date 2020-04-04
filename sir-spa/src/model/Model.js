@@ -17,6 +17,9 @@ import { Space } from "model/Space"
 // potentialfelder - je typ
 // zeitlich anderes verhalten? hotspots aktiv - option nicht default
 
+// Gruppen durchmischung - ähnlicher ausgangsort
+// initial gruppe zuweisen ?
+
 class SIR_Model {
   // agent based SIR-Model
     constructor(
@@ -38,7 +41,7 @@ class SIR_Model {
       this.steps_till_symptoms = 2;
       this.max_step = max_step;
       this.movement = "random";
-      this.repulsion_range = 5;
+      this.repulsion_range = 5; // has to be greater than infection range
 
       this.width = 50;
       this.height = 50;
@@ -67,6 +70,11 @@ class SIR_Model {
     }
 
     initialize() {
+      if (this.infection_radius > this.repulsion_range) {
+        console.log("Error: Infection range has to be smaller or equal to repulsion range. Set to repulsion range");
+        this.infection_radius = this.repulsion_range;
+      }
+
       // agents
       this.s_list = [];
       this.r_list = [];
