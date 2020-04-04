@@ -14,11 +14,12 @@ class Space {
         this.attractive_points = new Array();
         this.add_attraction_at([Math.floor(this.width/2), Math.floor(this.width/2)], 0.25); // middle of grid as attractive force)
 
+        /*
         this.add_attraction_at([10, this.height-10], 0.25); // up left
         this.add_attraction_at([this.width-10, this.height-10], 0.25); // up right
         this.add_attraction_at([10, 10], 0.25); // down left        
         this.add_attraction_at([this.width-10, 10], 0.25); // down right
-
+        */
         this.repulsion_force_multiplier = 2;
         this.lc = [...Array(this.height)].map(x=>Array(this.width).fill(-1))  
         this.ll = new Array();
