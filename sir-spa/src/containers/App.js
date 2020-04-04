@@ -11,7 +11,7 @@ import {
   MenuItem,
   Select,
   Button,
-  Divider
+  Divider,
 } from "@material-ui/core";
 import { PixiRenderer } from "components/PixiRenderer";
 
@@ -38,27 +38,27 @@ function App() {
   const updateModel = () => {
     let isSimulationEnd = model.step();
     let newAgentList = [];
-    let newSList = model.s_list.map(agent => {
+    let newSList = model.s_list.map((agent) => {
       if (agent.infected === true) {
         agent.state = "infected_unrecognized";
       } else {
         agent.state = "susceptible";
       }
 
-      return agent;
+      return Object.assign({}, agent);
     });
 
     newAgentList.push(...newSList);
 
-    let newIList = model.i_list.map(agent => {
+    let newIList = model.i_list.map((agent) => {
       agent.state = "infected";
-      return agent;
+      return Object.assign({}, agent);
     });
     newAgentList.push(...newIList);
 
-    let newRList = model.r_list.map(agent => {
+    let newRList = model.r_list.map((agent) => {
       agent.state = "recovered";
-      return agent;
+      return Object.assign({}, agent);
     });
     newAgentList.push(...newRList);
 
@@ -175,7 +175,7 @@ function App() {
                   fullWidth
                   variant="outlined"
                   value={profile}
-                  onChange={event => {
+                  onChange={(event) => {
                     setProfile(event.target.value);
                   }}
                 >
@@ -257,6 +257,7 @@ function App() {
                 agentList={agentList}
                 worldWidth={worldWidth}
                 worldHeight={worldWidth}
+                stepDuration={stepDuration}
               />
             </Grid>
           </Grid>
