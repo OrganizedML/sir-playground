@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { SIR_Model } from "model/Model";
 import {
   AppBar,
@@ -14,15 +14,22 @@ import {
   Divider,
 } from "@material-ui/core";
 import { PixiRenderer } from "components/PixiRenderer";
+import { Line } from "react-chartjs-2";
 
 let interval = null;
 let model = null;
+
+let history = [];
 
 function App() {
   // For rendering
   const [agentList, setAgentList] = useState([]);
   const [worldWidth, setWorldWidth] = useState(undefined);
   const [worldHeight, setWorldHeight] = useState(undefined);
+
+  // For chart rendering
+  // const [history, setHistory] = useState([]);
+  const [chartData, setChartData] = useState({ labels: [], datasets: [] });
 
   // Configuration
   const [gameState, setGameState] = useState("stopped");
@@ -35,14 +42,23 @@ function App() {
   const [profile, setProfile] = useState("unrestricted");
   const [stepDuration, setStepDuration] = useState(0.5);
 
+  const chartRef = useRef(null);
+
   const updateModel = () => {
+    let newInfectedCount = 0;
+    let newInfectedUnrecognizedCount = 0;
+    let newSusceptibleCount = 0;
+    let newRecoveredCount = 0;
+
     let isSimulationEnd = model.step();
     let newAgentList = [];
     let newSList = model.s_list.map((agent) => {
       if (agent.infected === true) {
         agent.state = "infected_unrecognized";
+        newInfectedUnrecognizedCount += 1;
       } else {
         agent.state = "susceptible";
+        newSusceptibleCount += 1;
       }
 
       return Object.assign({}, agent);
@@ -52,12 +68,14 @@ function App() {
 
     let newIList = model.i_list.map((agent) => {
       agent.state = "infected";
+      newInfectedCount += 1;
       return Object.assign({}, agent);
     });
     newAgentList.push(...newIList);
 
     let newRList = model.r_list.map((agent) => {
       agent.state = "recovered";
+      newRecoveredCount += 1;
       return Object.assign({}, agent);
     });
     newAgentList.push(...newRList);
@@ -67,6 +85,63 @@ function App() {
       clearInterval(interval);
       setGameState("stopped");
     }
+
+    let newHistoryElement = {
+      infected: newInfectedCount,
+      infectedUnrecognized: newInfectedUnrecognizedCount,
+      recovered: newRecoveredCount,
+      susceptible: newSusceptibleCount,
+    };
+
+    let newHistory = [...history];
+    newHistory.push(newHistoryElement);
+    history = newHistory;
+
+    let newLabels = [];
+    let newSDataset = {
+      label: "Susceptible",
+      fill: true,
+      lineTension: 0.1,
+      borderColor: "rgba(0,0,0,1)",
+      pointBackgroundColor: "#fff",
+      pointBorderWidth: 1,
+      pointHoverRadius: 5,
+      data: [],
+    };
+    let newIDataset = {
+      label: "Infected",
+      fill: true,
+      lineTension: 0.1,
+      borderColor: "rgba(255,0,0,1)",
+      pointBackgroundColor: "#fff",
+      pointBorderWidth: 1,
+      pointHoverRadius: 5,
+      data: [],
+    };
+
+    let newRDataset = {
+      label: "Recovered",
+      fill: true,
+      lineTension: 0.1,
+      borderColor: "rgba(0,255,0,1)",
+      pointBackgroundColor: "#fff",
+      pointBorderWidth: 1,
+      pointHoverRadius: 5,
+      data: [],
+    };
+    newHistory.forEach((histEl, index) => {
+      newSDataset.data.push(histEl.susceptible);
+      newIDataset.data.push(histEl.infected);
+      newRDataset.data.push(histEl.recovered);
+      newLabels.push(index);
+    });
+
+    let newChartData = {
+      labels: newLabels,
+      datasets: [newIDataset, newRDataset, newSDataset],
+    };
+
+    setChartData(newChartData);
   };
 
   return (
@@ -254,6 +329,20 @@ function App() {
                 worldWidth={worldWidth}
                 worldHeight={worldWidth}
                 stepDuration={stepDuration}
+              />
+            </Grid>
+            <Grid item xs={4}></Grid>
+            <Grid item xs={8}>
+              <Line
+                ref={chartRef}
+                data={chartData}
+                options={{
+                  elements: {
+                    point: {
+                      radius: 0,
+                    },
+                  },
+                }}
               />
             </Grid>
           </Grid>
