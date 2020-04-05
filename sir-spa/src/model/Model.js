@@ -29,7 +29,7 @@ class SIR_Model {
         infection_probability_onContact=0.25,
         duration_mean=10,
         infection_recoginition_probability=0.8,
-        max_step=200
+        max_step=400
         ) {
 
       this.population = population;
@@ -45,6 +45,19 @@ class SIR_Model {
 
       this.width = 50;
       this.height = 50;
+
+      this.steps_each_day = 48; // half an hour
+      this.step_num = 0;
+      this.day = 0;
+      this.current_mode = "night";
+      // schedule - night - morning - work - afterwork - evening
+      this.schedule = {
+        "night": 15,
+        "morning": 19,
+        "work": 35,
+        "afterwork": 41,
+        "evening": 47
+      }
     }
 
     reset() {
@@ -88,6 +101,11 @@ class SIR_Model {
 
       // grid world model
       this.space = new Space(this.width, this.height);
+      
+      // schedule
+      this.day = 0;
+      this.step_num = 0;
+      this.current_mode = "night";
 
       // setup population
       var unique_id;
@@ -243,25 +261,56 @@ class SIR_Model {
       return (( (dIdt + 0.01) /(gamma*count_infected) + 1) * this.population / count_susceptible)
     }
 
+    calculate_mode() {
+      var daily_step = this.step_num % this.steps_each_day;
+      var mode;
+      if (daily_step <= this.schedule["night"]) {
+        mode = "night"
+      } else if (daily_step > this.schedule["night"] && daily_step <= this.schedule["morning"]) {
+        mode = "morning"
+      } else if (daily_step > this.schedule["morning"] && daily_step <= this.schedule["work"]) {
+        mode = "work"
+      } else if (daily_step > this.schedule["work"] && daily_step <= this.schedule["afterwork"]) {
+        mode = "afterwork"
+      } else if (daily_step > this.schedule["afterwork"] && daily_step <= this.schedule["evening"]) {
+        mode = "evening"
+      }
+
+      return mode;
+    }
+
 
     step() {
       this.space.update_linked_cell(this.repulsion_range);
+
+      // get mode of current step
+      this.current_mode = this.calculate_mode();
 
       // step for each class
       var num_sus = this.step_s()
       var num_inf = this.step_i()
       var num_rem = this.step_r()
       
+      /*
       console.log("Susceptible:" + num_sus[0]);
       console.log("Susceptible with Infection:" + num_sus[1]);
       console.log("Identified Infected:" + num_inf);
       console.log("Removed - Recovered:" + num_rem);
-
+      
       var curr_R0 = this.calculate_R0(num_sus[0], (num_inf + num_sus[1]), num_rem);
       this.R_array.push(curr_R0);
       console.log("Basic Reproduction Number (current):" + curr_R0);
       var R0_mean = this.R_array.slice(-10).reduce(function(pv, cv) { return pv + cv; }, 0) / this.R_array.slice(-10).length;
       console.log("Basic Reproduction Number (mean, last 10):" + R0_mean);
+      */
+
+      console.log("Day: "+ this.day);
+      console.log("Mode: "+ this.current_mode);
+      console.log("Step - day-cycle: "+ this.step_num % this.steps_each_day);
+
+      // update step count and day
+      this.step_num += 1;
+      this.day = Math.floor(this.step_num / this.steps_each_day);
 
       if (num_inf + num_sus[1] == 0) {
         return true;
@@ -271,6 +320,7 @@ class SIR_Model {
     }
 
     // remove sleep - regelmäßiges aufrufen - step methoden bei aufruf
+    // depricated: run via App.js
     async run() {
       this.reset()
       this.initialize()

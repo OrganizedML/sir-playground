@@ -13,16 +13,15 @@ class Space {
         // potential fields
         this.attractive_points = new Array();
 
-        
-        this.add_attraction_at([Math.floor(this.width/2), Math.floor(this.width/2)], 0.25); // middle of grid as attractive force)
-
+        this.add_attraction_at([Math.floor(this.width/2), Math.floor(this.width/2)], 0.25, "work"); // middle of grid as attractive force)
         /*
+        // removed due to schedule and time related hotspots
         this.add_attraction_at([10, this.height-10], 0.25); // up left
         this.add_attraction_at([this.width-10, this.height-10], 0.25); // up right
         this.add_attraction_at([10, 10], 0.25); // down left        
         this.add_attraction_at([this.width-10, 10], 0.25); // down right
         */
-
+        
         this.repulsion_force_multiplier = 2;
         this.lc = [...Array(this.height)].map(x=>Array(this.width).fill(-1))  
         this.ll = new Array();
@@ -33,8 +32,9 @@ class Space {
     // Linked Cell + Potential Field
     // each step: update linked cell
     // each movement: get potential force for each agent
-    add_attraction_at(position, multiplier) {
-        this.attractive_points.push([position, multiplier]);// pos + value
+    add_attraction_at(position, multiplier, active_at) {
+        // active_at should be list like ["night", "afterwork"]
+        this.attractive_points.push([position, multiplier, active_at]);// pos + value
     }
 
     get_local_repulsion_positions(uid_list) {
@@ -72,14 +72,15 @@ class Space {
             force_y_rep += - U_grad_rep * (agent.position[1] - p[1]) / dist;
 
         }
-      
-        for (var att of this.attractive_points) { //-\nabla U_{att}(\mathbf{x}) = -\alpha (\mathbf{x}-\mathbf{x_{goal}}) 
-            var dist = distance(agent.position, att[0]);
 
-            // normalize 
-            force_x_att += - att[1] * (agent.position[0] - att[0][0])/ dist;
-            force_y_att += - att[1] * (agent.position[1] - att[0][1])/ dist;
-            
+        for (var att of this.attractive_points) { //-\nabla U_{att}(\mathbf{x}) = -\alpha (\mathbf{x}-\mathbf{x_{goal}}) 
+            if (att[2].includes(agent.model.current_mode)) {
+                var dist = distance(agent.position, att[0]);
+
+                // normalize 
+                force_x_att += - att[1] * (agent.position[0] - att[0][0])/ dist;
+                force_y_att += - att[1] * (agent.position[1] - att[0][1])/ dist;
+            }            
         }
         return [alpha*force_x_att - beta*force_x_rep, alpha*force_y_att - beta*force_y_rep] // todo weight rep and att
     }
@@ -166,13 +167,13 @@ class Space {
 
     // 2D - GRID
     //
-    add_agent(agent, position) {
+    add_agent(agent, home) {
 
         var info = [1, agent.unique_id];
 
-        if (agent.position == position) {
-            this.world[position[0]][position[1]] = info;
-            this.agent_list.push([agent.unique_id, position])
+        if (agent.position == home) {
+            this.world[home[0]][home[1]] = info;
+            this.agent_list.push([agent.unique_id, agent.position, home])
 
         } else {
             console.log("Error setting up new agents")
@@ -197,6 +198,7 @@ class Space {
     }
 
     get_random_position_empty() {
+        // todo: kann bleiben, da nur initial ausgeführt
 
         do {
             var x = Math.floor((Math.random() * this.width));
@@ -208,6 +210,7 @@ class Space {
 
 
     get_neighborhood_empty(position) {
+        // todo: umbauen auf cont space
 
         var list = [];
         // Rand ist Ende der Welt
@@ -227,32 +230,14 @@ class Space {
     }
 
     get_agents_inRange(agent, infection_range) {
-
         var list = new Array();
-        // Rand ist Ende der Welt
-        
-        for(var x of range((agent.position[0]-infection_range), (agent.position[0]+infection_range))) {
-            if (x < this.width && x >= 0) {
-                for(var y of range((agent.position[1]-infection_range), (agent.position[1]+infection_range))) {
-                    if (y < this.height && y >= 0) {
-                        if (this.world[x][y][0] == 1 && [x,y] != agent.position) {
-                            list.push(this.world[x][y][1]); // push the unique_id
-                        }
-                    }
-                }
-            }
-        }
-        
-       /*
-        // todo umbauen ohne grid zu verwenden - agent list sollte dict sein!
         var uids_pos_repulsion = this.inRange_linked_cell(agent.position, agent.unique_id, agent.model.repulsion_range, true); // [0]: uid; [1]: position
-
+        
         for (var uid_pos of uids_pos_repulsion) {
             if (distance(agent.position, uid_pos[1]) < infection_range) {
                 list.push(uid_pos[0]);
             }
         }
-        */
 
         // return uids of agents in range
         return list
@@ -264,11 +249,13 @@ class Space {
         var agent_inList = this.agent_list[found_index];
         
 
-        if (agent_inList.length ) {
+        if (agent_inList.length) {
             var old_pos = agent_inList[1];
 
+            // todo: überflüssig machen
             this.world[old_pos[0]][old_pos[1]] = [0, 0];
             this.world[new_position[0]][new_position[1]] = [1, agent.unique_id];
+
             this.agent_list[found_index][1] = new_position;
         } else {
             console.log("Error moving agent")

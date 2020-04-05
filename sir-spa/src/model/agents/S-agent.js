@@ -20,7 +20,7 @@ class Susceptible extends Agent {
         // todo: faster if not whole array?
         // interact with other agents
         if (this.infected) {
-            if (this.steps_since_infection > this.model.duration_mean) {
+            if (Math.floor(this.steps_since_infection / this.model.steps_each_day) > this.model.duration_mean) {
                 to_r = this.unique_id;
 
             } else if (Math.random() < this.model.infection_recoginition_probability && this.steps_since_infection > this.model.steps_till_symptoms) {
