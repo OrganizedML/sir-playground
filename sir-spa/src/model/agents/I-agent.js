@@ -18,7 +18,7 @@ class Infected extends Agent {
         var to_r = -1
 
         // interact agents
-        if (this.steps_since_infection > this.model.duration_mean) {
+        if (Math.floor(this.steps_since_infection / this.model.steps_each_day) > this.model.duration_mean) {
             to_r = this.unique_id
 
         } else {
