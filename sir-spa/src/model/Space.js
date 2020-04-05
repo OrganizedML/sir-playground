@@ -5,9 +5,167 @@ class Space {
         // only 2D - only 1 agent per cell
         this.world = [...Array(this.height)].map(x=>Array(this.width).fill([0, 0]))  
         this.agent_list = []
+
         // -> Nachbarschaftsliste - kontinuerlicher Raum - l n liste WiPro
+        this.lc = [...Array(this.height)].map(x=>Array(this.width).fill(-1))  
+        this.ll = [-1];
+
+        // potential fields
+        this.attractive_points = new Array();
+
+        
+        this.add_attraction_at([Math.floor(this.width/2), Math.floor(this.width/2)], 0.25); // middle of grid as attractive force)
+
+        /*
+        this.add_attraction_at([10, this.height-10], 0.25); // up left
+        this.add_attraction_at([this.width-10, this.height-10], 0.25); // up right
+        this.add_attraction_at([10, 10], 0.25); // down left        
+        this.add_attraction_at([this.width-10, 10], 0.25); // down right
+        */
+
+        this.repulsion_force_multiplier = 2;
+        this.lc = [...Array(this.height)].map(x=>Array(this.width).fill(-1))  
+        this.ll = new Array();
+        this.ll[0] = [-1, -1, [0, 0]];
     }
 
+
+    // Linked Cell + Potential Field
+    // each step: update linked cell
+    // each movement: get potential force for each agent
+    add_attraction_at(position, multiplier) {
+        this.attractive_points.push([position, multiplier]);// pos + value
+    }
+
+    get_local_repulsion_positions(uid_list) {
+        if (uid_list.length > 0) {
+            var positions = new Array();
+            var agents_inrange = this.agent_list.filter(function(value) {return uid_list.includes(value[0])}); // filter by uid
+
+            for (var ag of agents_inrange) {
+                positions.push(ag[1]); // add position of agents in range
+            }
+            
+            return positions;
+        } else {
+            return [];
+        }
+
+
+    }
+
+    get_potential_force(agent, alpha=1, beta=3) {
+        var force_x_rep = 0;
+        var force_y_rep = 0;
+        var force_x_att = 0;
+        var force_y_att = 0;
+
+        var uid_list = this.inRange_linked_cell(agent.position, agent.unique_id, agent.model.repulsion_range); // range == infection range for movement
+        var pos = this.get_local_repulsion_positions(uid_list);
+        
+        for (var p of pos) {
+            var dist = distance(agent.position, p);
+            var U_grad_rep = this.repulsion_force_multiplier / Math.pow(dist, 2) *(1 / dist - 1/ (agent.model.repulsion_range + 0.1));
+            
+            // normalize
+            force_x_rep += - U_grad_rep * (agent.position[0] - p[0]) / dist;
+            force_y_rep += - U_grad_rep * (agent.position[1] - p[1]) / dist;
+
+        }
+      
+        for (var att of this.attractive_points) { //-\nabla U_{att}(\mathbf{x}) = -\alpha (\mathbf{x}-\mathbf{x_{goal}}) 
+            var dist = distance(agent.position, att[0]);
+
+            // normalize 
+            force_x_att += - att[1] * (agent.position[0] - att[0][0])/ dist;
+            force_y_att += - att[1] * (agent.position[1] - att[0][1])/ dist;
+            
+        }
+        return [alpha*force_x_att - beta*force_x_rep, alpha*force_y_att - beta*force_y_rep] // todo weight rep and att
+    }
+
+    reset_linked_cell(range) {
+        this.lc = [...Array(Math.floor(this.height/range)+1)].map(x=>Array(Math.floor(this.width/range)+1).fill(-1))  
+        this.ll.splice(0, this.ll.length);
+        this.ll[0] = [-1, -1, [0, 0]];
+    }
+
+    update_linked_cell(range) {
+        this.reset_linked_cell(range);
+
+        var n = 0;
+        for (var agent of this.agent_list) {
+            var nx = Math.floor(agent[1][0] / range);
+            var ny = Math.floor(agent[1][1] / range);
+
+            this.ll[n] = [this.lc[nx][ny], agent[0], agent[1]]; // ll list hast index for linked cell method and uid
+            this.lc[nx][ny] = n;
+            n++;
+        }
+    }
+
+    uids_in_cell_linked_cell(nx,ny) {
+        var uids = new Array();
+        var next;
+
+        next = this.lc[nx][ny]; // index des ersten atoms auslesen
+        while (this.ll[next][0] != -1) { //solange atome in Zelle nx, ny
+            uids.push(this.ll[next][1]); // add uid to list
+            next = this.ll[next][0]; // find next agent in ll
+        }
+
+        return uids
+    }
+
+    inRange_linked_cell(current_position, uid, range, with_position=false) {
+        var nx; 
+        nx = Math.floor(current_position[0] / range);
+        var ny;
+        ny = Math.floor(current_position[1] / range);
+
+        var uids_inRange = new Array(); //  problem hier? array hatt 20.000 einträge
+        var next;
+
+        next = this.lc[nx][ny]; // index des ersten agenten auslesen
+        if (next >= 0) {
+            while (this.ll[next][0] != -1) { //solange atome in Zelle nx, ny
+                if (uid != this.ll[next][1]) {
+                    if (with_position) {
+                        uids_inRange.push([this.ll[next][1], this.ll[next][2]]); // todo add position to ll
+                    } else {
+                        uids_inRange.push(this.ll[next][1]); // add uid to list
+                    }
+                }
+                next = this.ll[next][0]; // find next agent in ll
+            }
+        }
+
+        return uids_inRange
+    }
+
+    inRange_all_uids_linked_cell(current_position, range, with_position=false) {
+        var nx = Math.floor(current_position[0] / range);
+        var ny = Math.floor(current_position[1] / range);
+
+        var uids_inRange = new Array();
+        var next;
+
+        next = this.lc[nx][ny]; // index des ersten atoms auslesen
+        while (this.ll[next][0] != -1) { //solange atome in Zelle nx, ny
+            if (with_position) {
+                uids_inRange.push([this.ll[next][1], this.ll[next][2]]); // todo add position to ll                
+            } else {
+                uids_inRange.push(this.ll[next][1]); // add uid to list
+            }
+            next = this.ll[next][0]; // find next agent in ll
+        }
+
+        return uids_inRange
+    }
+
+
+    // 2D - GRID
+    //
     add_agent(agent, position) {
 
         var info = [1, agent.unique_id];
@@ -68,21 +226,34 @@ class Space {
         return list
     }
 
-    get_agents_inRange(position, infection_range) {
+    get_agents_inRange(agent, infection_range) {
 
-        var list = [];
+        var list = new Array();
         // Rand ist Ende der Welt
-        for(var x of range((position[0]-infection_range), (position[0]+infection_range))) {
+        
+        for(var x of range((agent.position[0]-infection_range), (agent.position[0]+infection_range))) {
             if (x < this.width && x >= 0) {
-                for(var y of range((position[1]-infection_range), (position[1]+infection_range))) {
+                for(var y of range((agent.position[1]-infection_range), (agent.position[1]+infection_range))) {
                     if (y < this.height && y >= 0) {
-                        if (this.world[x][y][0] == 1 && [x,y] != position) {
+                        if (this.world[x][y][0] == 1 && [x,y] != agent.position) {
                             list.push(this.world[x][y][1]); // push the unique_id
                         }
                     }
                 }
             }
         }
+        
+       /*
+        // todo umbauen ohne grid zu verwenden - agent list sollte dict sein!
+        var uids_pos_repulsion = this.inRange_linked_cell(agent.position, agent.unique_id, agent.model.repulsion_range, true); // [0]: uid; [1]: position
+
+        for (var uid_pos of uids_pos_repulsion) {
+            if (distance(agent.position, uid_pos[1]) < infection_range) {
+                list.push(uid_pos[0]);
+            }
+        }
+        */
+
         // return uids of agents in range
         return list
     }
@@ -111,6 +282,10 @@ function range(start, end) {
         ans.push(i);
     }
     return ans;
+}
+
+function distance(array1, array2) {
+    return Math.sqrt(Math.pow(array1[0] - array2[0], 2) + Math.pow(array1[1] - array2[1], 2));
 }
 
 export {Space}

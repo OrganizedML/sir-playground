@@ -217,7 +217,7 @@ function App() {
                             initialInfected,
                             infectionRadius,
                             spreadProbability,
-                            infectionDuration,
+                            20,
                             probabilityRecognized,
                             999999999999
                           );
@@ -227,11 +227,7 @@ function App() {
                           setWorldHeight(model.height);
                           setWorldWidth(model.width);
                         }
-
-                        interval = setInterval(
-                          updateModel,
-                          stepDuration * 1000
-                        );
+                        interval = setInterval(updateModel, 100);
                       }
                     }}
                   >

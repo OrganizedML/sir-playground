@@ -10,7 +10,7 @@ class Removed extends Agent {
     }    
     // step
     step(){
-        this.move()
+        this.hotspot_move()
         // no interaction - only occupying space
     }
 

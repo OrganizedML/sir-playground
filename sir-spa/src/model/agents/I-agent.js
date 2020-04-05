@@ -24,7 +24,7 @@ class Infected extends Agent {
         } else {
             this.spread_infection();
             // move
-            this.move()
+            this.hotspot_move()
 
             // spread in new position
             this.spread_infection();

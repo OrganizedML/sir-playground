@@ -30,17 +30,20 @@ class Susceptible extends Agent {
                 // infected but not recognized
                 this.spread_infection();
                 // move agent
-                this.move()
+                // this.move()
+                this.hotspot_move()
                 // spread in new position
                 this.spread_infection();
                 this.steps_since_infection += 1;
             }
         }
         
-        this.move()
+        // move agent
+        // this.move()
+        this.hotspot_move()
                 
         // interact with admin
-        return to_r, to_i
+        return [to_r, to_i]
     }
 
 }

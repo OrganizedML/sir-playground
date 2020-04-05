@@ -3,7 +3,22 @@ import { Removed } from "model/agents/R-agent"
 import { Infected } from "model/agents/I-agent"
 import { Space } from "model/Space"
 
+// Bugs - Reset LL, model reset -> world reset
+
 // Todo: movement grid -> continuous
+// distanzen - kontinuerliche längenangaben.
+
+// zeit realer zeitschritt - realistische geschwindigkeit
+// -> energy / life movement
+
+// points of interes für agenten - ziele für agenten
+// hotspot: einkaufen/arbeit/wohnort
+
+// potentialfelder - je typ
+// zeitlich anderes verhalten? hotspots aktiv - option nicht default
+
+// Gruppen durchmischung - ähnlicher ausgangsort
+// initial gruppe zuweisen ?
 
 class SIR_Model {
   // agent based SIR-Model
@@ -26,9 +41,10 @@ class SIR_Model {
       this.steps_till_symptoms = 2;
       this.max_step = max_step;
       this.movement = "random";
+      this.repulsion_range = 5; // has to be greater than infection range
 
-      this.width = 50
-      this.height = 50
+      this.width = 50;
+      this.height = 50;
     }
 
     reset() {
@@ -54,15 +70,22 @@ class SIR_Model {
     }
 
     initialize() {
+      if (this.infection_radius > this.repulsion_range) {
+        console.log("Error: Infection range has to be smaller or equal to repulsion range. Set to repulsion range");
+        this.infection_radius = this.repulsion_range;
+      }
+
       // agents
       this.s_list = [];
       this.r_list = [];
       this.i_list = [];
+
       // R0
       this.old_R = [0, 0, 0];
       this.old_I = [this.initial_infected, this.initial_infected, this.initial_infected];
       this.old_S = [this.population - this.initial_infected, this.population - this.initial_infected, this.population - this.initial_infected];
       this.R_array = [1.0, 1.0]; // Todo
+
       // grid world model
       this.space = new Space(this.width, this.height);
 
@@ -71,6 +94,7 @@ class SIR_Model {
       for (unique_id of range(1, (this.population - this.initial_infected))) {
         var pos = this.space.get_random_position_empty();
         var new_agent = new Susceptible(unique_id, pos, this);
+
         // register agent
         this.s_list.push(new_agent);
         this.space.add_agent(new_agent, pos);
@@ -80,6 +104,7 @@ class SIR_Model {
       for (var u2 of range((unique_id + 1), (unique_id + this.initial_infected))) {
         pos = this.space.get_random_position_empty();
         new_agent = new Infected(u2, pos, this);
+
         // register agent
         this.i_list.push(new_agent);
         this.space.add_agent(new_agent, pos);
@@ -146,7 +171,7 @@ class SIR_Model {
 
       // iterate over every agent in s_list - apply step
       for (var key in this.s_list) {
-        var add_r, add_i = this.s_list[key].step(); // if class change -> no move
+        var [add_r, add_i] = this.s_list[key].step(); // if class change -> no move
         if (add_r >= 0) {
           to_r.push(add_r);
         } else if (add_i >= 0) {
@@ -201,27 +226,6 @@ class SIR_Model {
       return this.r_list.length
     }
 
-    /* // first try
-    calculate_R0(count_susceptible, count_infected, count_removed) {
-      // Todo: Basic reproduction number implementieren - https://web.stanford.edu/~jhj1/teachingdocs/Jones-Epidemics050308.pdf, https://wwwnc.cdc.gov/eid/article/25/1/17-1901_article
-      // R0 = βN / ν : β effective contact rate, ν removal rate; dr/dt = νi ; i = I/N, ds/dt = −βsi      
-      var i = count_infected / this.population;
-      var s = count_susceptible / this.population;
-      var r = count_removed / this.population;
-
-      var drdt = (count_removed - this.old_R.slice(-1)[0] + 0.01) / this.population;
-      var dsdt = (count_susceptible - this.old_S.slice(-1)[0] + 0.01) / this.population;
-
-      var beta = - 1/(s*i) * dsdt;
-      var ny = 1/i * drdt;
-      
-      this.old_R.push(count_removed);
-      this.old_S.push(count_susceptible);
-      this.old_I.push(count_infected);
-
-      return (beta * this.population / ny)
-    }
-    */
     
     calculate_R0(count_susceptible, count_infected, count_removed) {
       // Todo: Basic reproduction number implementieren - https://web.stanford.edu/~jhj1/teachingdocs/Jones-Epidemics050308.pdf, https://wwwnc.cdc.gov/eid/article/25/1/17-1901_article
@@ -239,22 +243,15 @@ class SIR_Model {
       return (( (dIdt + 0.01) /(gamma*count_infected) + 1) * this.population / count_susceptible)
     }
 
-    /* measurement directly is hard - which group to be under survaillance? till when?
-    measure_R(count_infected_old) {
-      // es fehlt bezug zu zeitschritt - menge an infizierten beim letzten Schritt oder zu beginn
-      // get has infected of each agent and divide by infected - only active ? I, Sw/I - or with R?
-      var infections
-
-      return ( 1/count_infected_old)
-    }
-    */
 
     step() {
+      this.space.update_linked_cell(this.repulsion_range);
+
+      // step for each class
       var num_sus = this.step_s()
       var num_inf = this.step_i()
       var num_rem = this.step_r()
-      // print canvas +
-      // set current statistics as info for dashboard
+      
       console.log("Susceptible:" + num_sus[0]);
       console.log("Susceptible with Infection:" + num_sus[1]);
       console.log("Identified Infected:" + num_inf);
