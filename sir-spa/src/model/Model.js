@@ -171,7 +171,7 @@ class SIR_Model {
 
       // iterate over every agent in s_list - apply step
       for (var key in this.s_list) {
-        var add_r, add_i = this.s_list[key].step(); // if class change -> no move
+        var [add_r, add_i] = this.s_list[key].step(); // if class change -> no move
         if (add_r >= 0) {
           to_r.push(add_r);
         } else if (add_i >= 0) {

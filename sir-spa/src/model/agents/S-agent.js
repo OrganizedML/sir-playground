@@ -43,7 +43,7 @@ class Susceptible extends Agent {
         this.hotspot_move()
                 
         // interact with admin
-        return to_r, to_i
+        return [to_r, to_i]
     }
 
 }

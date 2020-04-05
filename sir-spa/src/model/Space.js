@@ -12,6 +12,8 @@ class Space {
 
         // potential fields
         this.attractive_points = new Array();
+
+        
         this.add_attraction_at([Math.floor(this.width/2), Math.floor(this.width/2)], 0.25); // middle of grid as attractive force)
 
         /*
@@ -20,6 +22,7 @@ class Space {
         this.add_attraction_at([10, 10], 0.25); // down left        
         this.add_attraction_at([this.width-10, 10], 0.25); // down right
         */
+
         this.repulsion_force_multiplier = 2;
         this.lc = [...Array(this.height)].map(x=>Array(this.width).fill(-1))  
         this.ll = new Array();
@@ -62,11 +65,12 @@ class Space {
         
         for (var p of pos) {
             var dist = distance(agent.position, p);
-            var U_grad_rep = this.repulsion_force_multiplier / Math.pow(dist, 2) *(1 / dist - 1/ agent.model.repulsion_range);
+            var U_grad_rep = this.repulsion_force_multiplier / Math.pow(dist, 2) *(1 / dist - 1/ (agent.model.repulsion_range + 0.1));
             
             // normalize
             force_x_rep += - U_grad_rep * (agent.position[0] - p[0]) / dist;
-            force_y_rep +=  -U_grad_rep * (agent.position[1] - p[1]) / dist;
+            force_y_rep += - U_grad_rep * (agent.position[1] - p[1]) / dist;
+
         }
       
         for (var att of this.attractive_points) { //-\nabla U_{att}(\mathbf{x}) = -\alpha (\mathbf{x}-\mathbf{x_{goal}}) 
@@ -77,7 +81,7 @@ class Space {
             force_y_att += - att[1] * (agent.position[1] - att[0][1])/ dist;
             
         }
-        return [alpha*force_x_att + beta*force_x_rep, alpha*force_y_att + beta*force_y_rep] // todo weight rep and att
+        return [alpha*force_x_att - beta*force_x_rep, alpha*force_y_att - beta*force_y_rep] // todo weight rep and att
     }
 
     reset_linked_cell(range) {

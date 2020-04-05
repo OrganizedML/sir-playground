@@ -35,9 +35,12 @@ class Agent{
     hotspot_move() {
         var empyt_cells = [];
         var potForce = this.model.space.get_potential_force(this);
-        // todo normalize?
-        potForce[0] += this.dx + (Math.random() - 0.5) * 2;
-        potForce[1] += this.dy + (Math.random() - 0.5) * 2;
+
+        // random activity
+        if (Math.random() > 0.5) {
+            potForce[0] += this.dx + (Math.random() - 0.5) * 2;
+            potForce[1] += this.dy + (Math.random() - 0.5) * 2;
+        }
         
         potForce = normalize_2D(potForce);
         this.dx = potForce[0];
