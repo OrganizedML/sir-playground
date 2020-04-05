@@ -3,16 +3,11 @@ import { Removed } from "model/agents/R-agent"
 import { Infected } from "model/agents/I-agent"
 import { Space } from "model/Space"
 
-// Bugs - Reset LL, model reset -> world reset
-
 // Todo: movement grid -> continuous
 // distanzen - kontinuerliche längenangaben.
 
 // zeit realer zeitschritt - realistische geschwindigkeit
 // -> energy / life movement
-
-// points of interes für agenten - ziele für agenten
-// hotspot: einkaufen/arbeit/wohnort
 
 // potentialfelder - je typ
 // zeitlich anderes verhalten? hotspots aktiv - option nicht default

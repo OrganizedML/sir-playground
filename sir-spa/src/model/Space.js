@@ -77,11 +77,18 @@ class Space {
             if (att[2].includes(agent.model.current_mode)) {
                 var dist = distance(agent.position, att[0]);
 
-                // normalize 
+                // normalize - later
                 force_x_att += - att[1] * (agent.position[0] - att[0][0])/ dist;
                 force_y_att += - att[1] * (agent.position[1] - att[0][1])/ dist;
             }            
         }
+
+        if (force_x_att == 0 && force_y_att == 0) {
+            var dist = distance(agent.position, att[0]);
+            force_x_att += - att[1] * (agent.position[0] - att[0][0])/ dist;
+            force_y_att += - att[1] * (agent.position[1] - att[0][1])/ dist;
+        }
+
         return [alpha*force_x_att - beta*force_x_rep, alpha*force_y_att - beta*force_y_rep] // todo weight rep and att
     }
 
