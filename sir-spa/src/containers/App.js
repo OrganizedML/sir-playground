@@ -302,7 +302,7 @@ function App() {
                           setWorldHeight(model.height);
                           setWorldWidth(model.width);
                         }
-                        interval = setInterval(updateModel, 100);
+                        interval = setInterval(updateModel, stepDuration * 1000);
                       }
                     }}
                   >
