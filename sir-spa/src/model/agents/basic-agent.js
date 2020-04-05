@@ -33,6 +33,7 @@ class Agent{
 
     // movement
     hotspot_move() {
+        // todo: fix parameters, random, pot and last step
         var empyt_cells = [];
         var potForce = this.model.space.get_potential_force(this);
 

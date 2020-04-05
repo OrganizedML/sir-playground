@@ -82,6 +82,17 @@ class Space {
                 force_y_att += - att[1] * (agent.position[1] - att[0][1])/ dist;
             }            
         }
+
+        if (force_x_att == 0 && force_y_att == 0) {
+            
+            var home_pos = this.agent_list.filter(function(ag) {return ag[0] == agent.unique_id;})[0];
+            var dist = distance(agent.position, home_pos[2]); // home position
+            
+            // normalize 
+            force_x_att += - (agent.position[0] - home_pos[2][0])/ dist;
+            force_y_att += - (agent.position[1] - home_pos[2][1])/ dist;
+        }
+
         return [alpha*force_x_att - beta*force_x_rep, alpha*force_y_att - beta*force_y_rep] // todo weight rep and att
     }
 

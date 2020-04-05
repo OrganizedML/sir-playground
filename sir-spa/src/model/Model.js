@@ -3,16 +3,11 @@ import { Removed } from "model/agents/R-agent"
 import { Infected } from "model/agents/I-agent"
 import { Space } from "model/Space"
 
-// Bugs - Reset LL, model reset -> world reset
-
 // Todo: movement grid -> continuous
 // distanzen - kontinuerliche längenangaben.
 
 // zeit realer zeitschritt - realistische geschwindigkeit
-// -> energy / life movement
-
-// points of interes für agenten - ziele für agenten
-// hotspot: einkaufen/arbeit/wohnort
+// -> energy / life movementt
 
 // potentialfelder - je typ
 // zeitlich anderes verhalten? hotspots aktiv - option nicht default
@@ -59,6 +54,7 @@ class SIR_Model {
         "evening": 47
       }
     }
+    
 
     reset() {
       if (typeof this.s_list !== "undefined") {
@@ -81,6 +77,7 @@ class SIR_Model {
 
       // del every agent ?
     }
+
 
     initialize() {
       if (this.infection_radius > this.repulsion_range) {
@@ -129,6 +126,7 @@ class SIR_Model {
       }
     }
 
+
     move_to_r(list_uids, from) {
       var uid;
 
@@ -162,6 +160,7 @@ class SIR_Model {
       }
     }
 
+
     move_to_i(list_uids) {
       var uid;
 
@@ -182,6 +181,7 @@ class SIR_Model {
         this.space.add_agent(new_agent, new_agent.position);
       }
     }
+
 
     step_s(){
       var to_r = [];
@@ -213,6 +213,7 @@ class SIR_Model {
       return [healthy.length, this.s_list.length - healthy.length] 
     }
 
+
     step_i(){
       var to_r = [];
 
@@ -232,6 +233,7 @@ class SIR_Model {
       // return for statistics
       return this.i_list.length
     }
+
       
     step_r() {
 
@@ -260,6 +262,7 @@ class SIR_Model {
 
       return (( (dIdt + 0.01) /(gamma*count_infected) + 1) * this.population / count_susceptible)
     }
+
 
     calculate_mode() {
       var daily_step = this.step_num % this.steps_each_day;
