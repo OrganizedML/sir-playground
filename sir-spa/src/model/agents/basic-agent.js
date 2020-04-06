@@ -44,12 +44,14 @@ class Agent{
         potForce[0] += this.dx + random_multiplier * (Math.random() - 0.5) * 2;
         potForce[1] += this.dy + random_multiplier * (Math.random() - 0.5) * 2;
         
-        
+        // normalize Force - maybe scale instead? 0-2?
         potForce = normalize_2D(potForce);
         this.dx = potForce[0]; // 0-1
         this.dy = potForce[1]; // 0-1
 
-        // move only in empty cell - otherwise dont move - testing - todo
+        // TODO UMBAUEN OHNE GRID -> Move, check if overlap, correct movement - left, right, random -dont move after a few tries
+
+        // move only in empty cell
         empyt_cells = this.model.space.get_neighborhood_empty(this.position);
         
         // round -> if movement > 0.5 than move
