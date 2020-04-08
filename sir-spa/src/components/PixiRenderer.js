@@ -12,6 +12,8 @@ const renderWidth = 600;
 const renderHeight = 600;
 let elapsedTime = 0.0;
 
+let tickerFunc;
+
 const PixiRenderer = React.memo(
   ({ agentList, worldWidth, worldHeight, stepDuration }) => {
     const stageContainer = useRef(null);
@@ -50,7 +52,7 @@ const PixiRenderer = React.memo(
             fill: 0x5555ff,
             align: "center",
           });
-          
+
           app.stage.addChild(text);
 
           agents[agent.unique_id] = {
@@ -109,80 +111,81 @@ const PixiRenderer = React.memo(
           height: renderHeight,
           transparent: true,
         });
-        app.ticker.add((deltaTime) => {
-          elapsedTime += deltaTime / PIXI.settings.TARGET_FPMS / 1000;
-          Object.keys(agents).forEach((unique_id) => {
-            let agentInfo = agents[unique_id];
-            if (!agentInfo.oldPos) {
-              console.log(agentInfo);
-            }
+        stageContainer.current.appendChild(app.view);
 
-            agentInfo.sprite.x =
-              agentInfo.oldPos[0] * (renderWidth / worldWidth) +
-              (agentInfo.agent.position[0] * (renderWidth / worldWidth) -
-                agentInfo.oldPos[0] * (renderWidth / worldWidth)) *
-                Math.min(elapsedTime / stepDuration, 1.0);
-            agentInfo.sprite.y =
-              agentInfo.oldPos[1] * (renderHeight / worldHeight) +
-              (agentInfo.agent.position[1] * (renderHeight / worldHeight) -
-                agentInfo.oldPos[1] * (renderHeight / worldHeight)) *
-                Math.min(elapsedTime / stepDuration, 1.0);
+        let gr = new PIXI.Graphics();
+        gr.beginFill(0x000000);
+        gr.lineStyle(0);
+        gr.drawCircle(
+          renderWidth / worldWidth,
+          renderHeight / worldHeight,
+          Math.min(renderWidth / worldWidth, renderHeight / worldHeight)
+        );
+        gr.endFill();
 
-            agentInfo.text.x = agentInfo.sprite.x;
-            agentInfo.text.y = agentInfo.sprite.y + (renderHeight / worldHeight);
-          });
+        susceptibleTex = app.renderer.generateTexture(gr);
+
+        gr = new PIXI.Graphics();
+        gr.beginFill(0xff0000);
+        gr.lineStyle(0);
+        gr.drawCircle(
+          renderWidth / worldWidth,
+          renderHeight / worldHeight,
+          Math.min(renderWidth / worldWidth, renderHeight / worldHeight)
+        );
+        gr.endFill();
+
+        infectedTex = app.renderer.generateTexture(gr);
+
+        gr = new PIXI.Graphics();
+        gr.beginFill(0x0000ff);
+        gr.lineStyle(0);
+        gr.drawCircle(
+          renderWidth / worldWidth,
+          renderHeight / worldHeight,
+          Math.min(renderWidth / worldWidth, renderHeight / worldHeight)
+        );
+        gr.endFill();
+
+        infectedUnrecognizedTex = app.renderer.generateTexture(gr);
+
+        gr = new PIXI.Graphics();
+        gr.beginFill(0x00ff00);
+        gr.lineStyle(0);
+        gr.drawCircle(
+          renderWidth / worldWidth,
+          renderHeight / worldHeight,
+          Math.min(renderWidth / worldWidth, renderHeight / worldHeight)
+        );
+        gr.endFill();
+
+        recoveredTex = app.renderer.generateTexture(gr);
+      }
+      app.ticker.remove(tickerFunc);
+      tickerFunc = (deltaTime) => {
+        elapsedTime += deltaTime / PIXI.settings.TARGET_FPMS / 1000;
+        Object.keys(agents).forEach((unique_id) => {
+          let agentInfo = agents[unique_id];
+          if (!agentInfo.oldPos) {
+            console.log(agentInfo);
+          }
+
+          agentInfo.sprite.x =
+            agentInfo.oldPos[0] * (renderWidth / worldWidth) +
+            (agentInfo.agent.position[0] * (renderWidth / worldWidth) -
+              agentInfo.oldPos[0] * (renderWidth / worldWidth)) *
+              Math.min(elapsedTime / stepDuration, 1.0);
+          agentInfo.sprite.y =
+            agentInfo.oldPos[1] * (renderHeight / worldHeight) +
+            (agentInfo.agent.position[1] * (renderHeight / worldHeight) -
+              agentInfo.oldPos[1] * (renderHeight / worldHeight)) *
+              Math.min(elapsedTime / stepDuration, 1.0);
+
+          agentInfo.text.x = agentInfo.sprite.x;
+          agentInfo.text.y = agentInfo.sprite.y + renderHeight / worldHeight;
         });
       }
-
-      stageContainer.current.appendChild(app.view);
-
-      let gr = new PIXI.Graphics();
-      gr.beginFill(0x000000);
-      gr.lineStyle(0);
-      gr.drawCircle(
-        renderWidth / worldWidth,
-        renderHeight / worldHeight,
-        Math.min(renderWidth / worldWidth, renderHeight / worldHeight)
-      );
-      gr.endFill();
-
-      susceptibleTex = app.renderer.generateTexture(gr);
-
-      gr = new PIXI.Graphics();
-      gr.beginFill(0xff0000);
-      gr.lineStyle(0);
-      gr.drawCircle(
-        renderWidth / worldWidth,
-        renderHeight / worldHeight,
-        Math.min(renderWidth / worldWidth, renderHeight / worldHeight)
-      );
-      gr.endFill();
-
-      infectedTex = app.renderer.generateTexture(gr);
-
-      gr = new PIXI.Graphics();
-      gr.beginFill(0x0000ff);
-      gr.lineStyle(0);
-      gr.drawCircle(
-        renderWidth / worldWidth,
-        renderHeight / worldHeight,
-        Math.min(renderWidth / worldWidth, renderHeight / worldHeight)
-      );
-      gr.endFill();
-
-      infectedUnrecognizedTex = app.renderer.generateTexture(gr);
-
-      gr = new PIXI.Graphics();
-      gr.beginFill(0x00ff00);
-      gr.lineStyle(0);
-      gr.drawCircle(
-        renderWidth / worldWidth,
-        renderHeight / worldHeight,
-        Math.min(renderWidth / worldWidth, renderHeight / worldHeight)
-      );
-      gr.endFill();
-
-      recoveredTex = app.renderer.generateTexture(gr);
+      app.ticker.add(tickerFunc);
     }, [worldHeight, worldWidth, stepDuration]);
     elapsedTime = 0.0;
     return <div ref={stageContainer}></div>;
