@@ -44,6 +44,23 @@ function App() {
 
   const chartRef = useRef(null);
 
+  useEffect(() => {
+    model = new SIR_Model(
+      initialSuspectible,
+      initialInfected,
+      infectionRadius,
+      spreadProbability,
+      20,
+      probabilityRecognized,
+      999999999999
+    );
+
+    model.reset();
+    model.initialize();
+    setWorldHeight(model.height);
+    setWorldWidth(model.width);
+  }, []);
+
   const updateModel = () => {
     let newInfectedCount = 0;
     let newInfectedUnrecognizedCount = 0;
@@ -339,8 +356,7 @@ function App() {
                   worldHeight={worldWidth}
                   stepDuration={stepDuration}
                 />
-
-                <Box flexGrow={1}>
+                <Box height="200px">
                   <Line
                     ref={chartRef}
                     data={chartData}
