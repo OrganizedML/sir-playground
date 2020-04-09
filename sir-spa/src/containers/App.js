@@ -44,6 +44,23 @@ function App() {
 
   const chartRef = useRef(null);
 
+  useEffect(() => {
+    model = new SIR_Model(
+      initialSuspectible,
+      initialInfected,
+      infectionRadius,
+      spreadProbability,
+      20,
+      probabilityRecognized,
+      999999999999
+    );
+
+    model.reset();
+    model.initialize();
+    setWorldHeight(model.height);
+    setWorldWidth(model.width);
+  }, []);
+
   const updateModel = () => {
     let newInfectedCount = 0;
     let newInfectedUnrecognizedCount = 0;
@@ -151,210 +168,211 @@ function App() {
           <Typography variant="h6">SIR Playground</Typography>
         </Toolbar>
       </AppBar>
-      <Box mt={2} mb={2} flexGrow={1}>
+      <Box mt={2} mb={2} flexGrow={1} overflow="hidden">
         <Container style={{ height: "100%" }}>
-          <Box height="60%">
-            <Grid container spacing={2} height="100%">
-              <Grid item xs={4}>
-                <Box p={2}>
-                  <Typography variant="overline" gutterBottom>
-                    Initial Infected
-                  </Typography>
-                  <Slider
-                    valueLabelDisplay="auto"
-                    step={1}
-                    marks
-                    min={1}
-                    max={10}
-                    value={initialInfected}
-                    onChange={(event, newValue) => {
-                      setInitialInfected(newValue);
-                    }}
-                  />
-                  <Typography variant="overline" gutterBottom>
-                    Population
-                  </Typography>
-                  <Slider
-                    valueLabelDisplay="auto"
-                    step={25}
-                    marks
-                    min={25}
-                    max={500}
-                    value={initialSuspectible}
-                    onChange={(event, newValue) => {
-                      setInitialSuspectible(newValue);
-                    }}
-                  />
-                  <Typography variant="overline" gutterBottom>
-                    Probability Recognized
-                  </Typography>
-                  <Slider
-                    valueLabelDisplay="auto"
-                    step={0.05}
-                    marks
-                    min={0}
-                    max={1}
-                    value={probabilityRecognized}
-                    onChange={(event, newValue) => {
-                      setProbabilityRecognized(newValue);
-                    }}
-                  />
-                  <Typography variant="overline" gutterBottom>
-                    Infection Radius
-                  </Typography>
-                  <Slider
-                    valueLabelDisplay="auto"
-                    step={1}
-                    marks
-                    min={1}
-                    max={5}
-                    value={infectionRadius}
-                    onChange={(event, newValue) => {
-                      setInfectionRadius(newValue);
-                    }}
-                  />
-                  <Typography variant="overline" gutterBottom>
-                    Spread Probability
-                  </Typography>
-                  <Slider
-                    valueLabelDisplay="auto"
-                    step={0.05}
-                    marks
-                    min={0}
-                    max={1}
-                    value={spreadProbability}
-                    onChange={(event, newValue) => {
-                      setSpreadProbability(newValue);
-                    }}
-                  />
+          <Grid container spacing={2} style={{ height: "100%" }}>
+            <Grid item xs={4} height="100%">
+              <Box p={2}>
+                <Typography variant="overline" gutterBottom>
+                  Initial Infected
+                </Typography>
+                <Slider
+                  valueLabelDisplay="auto"
+                  step={1}
+                  marks
+                  min={1}
+                  max={10}
+                  value={initialInfected}
+                  onChange={(event, newValue) => {
+                    setInitialInfected(newValue);
+                  }}
+                />
+                <Typography variant="overline" gutterBottom>
+                  Population
+                </Typography>
+                <Slider
+                  valueLabelDisplay="auto"
+                  step={25}
+                  marks
+                  min={25}
+                  max={500}
+                  value={initialSuspectible}
+                  onChange={(event, newValue) => {
+                    setInitialSuspectible(newValue);
+                  }}
+                />
+                <Typography variant="overline" gutterBottom>
+                  Probability Recognized
+                </Typography>
+                <Slider
+                  valueLabelDisplay="auto"
+                  step={0.05}
+                  marks
+                  min={0}
+                  max={1}
+                  value={probabilityRecognized}
+                  onChange={(event, newValue) => {
+                    setProbabilityRecognized(newValue);
+                  }}
+                />
+                <Typography variant="overline" gutterBottom>
+                  Infection Radius
+                </Typography>
+                <Slider
+                  valueLabelDisplay="auto"
+                  step={1}
+                  marks
+                  min={1}
+                  max={5}
+                  value={infectionRadius}
+                  onChange={(event, newValue) => {
+                    setInfectionRadius(newValue);
+                  }}
+                />
+                <Typography variant="overline" gutterBottom>
+                  Spread Probability
+                </Typography>
+                <Slider
+                  valueLabelDisplay="auto"
+                  step={0.05}
+                  marks
+                  min={0}
+                  max={1}
+                  value={spreadProbability}
+                  onChange={(event, newValue) => {
+                    setSpreadProbability(newValue);
+                  }}
+                />
 
-                  <Typography variant="overline" gutterBottom>
-                    Mean Infection Duration
-                  </Typography>
-                  <Slider
-                    valueLabelDisplay="auto"
-                    step={5}
-                    marks
-                    min={5}
-                    max={15}
-                    value={infectionDuration}
-                    onChange={(event, newValue) => {
-                      setInfectionDuration(newValue);
-                    }}
-                  />
+                <Typography variant="overline" gutterBottom>
+                  Mean Infection Duration
+                </Typography>
+                <Slider
+                  valueLabelDisplay="auto"
+                  step={5}
+                  marks
+                  min={5}
+                  max={15}
+                  value={infectionDuration}
+                  onChange={(event, newValue) => {
+                    setInfectionDuration(newValue);
+                  }}
+                />
 
-                  <Typography variant="overline" gutterBottom>
-                    Profile
-                  </Typography>
-                  <br />
-                  <Select
-                    fullWidth
-                    variant="outlined"
-                    value={profile}
-                    onChange={(event) => {
-                      setProfile(event.target.value);
+                <Typography variant="overline" gutterBottom>
+                  Profile
+                </Typography>
+                <br />
+                <Select
+                  fullWidth
+                  variant="outlined"
+                  value={profile}
+                  onChange={(event) => {
+                    setProfile(event.target.value);
+                  }}
+                >
+                  <MenuItem value={"unrestricted"}>Unrestricted</MenuItem>
+                  <MenuItem value={"shopping_work"}>
+                    Shopping &amp; Work
+                  </MenuItem>
+                  <MenuItem value={"meet_friends"}>Meet Friends</MenuItem>
+                </Select>
+                <Divider />
+                <Typography variant="overline" gutterBottom>
+                  Step Period (s)
+                </Typography>
+                <Slider
+                  valueLabelDisplay="auto"
+                  step={0.1}
+                  marks
+                  min={0.1}
+                  max={2.0}
+                  value={stepDuration}
+                  onChange={(event, newValue) => {
+                    setStepDuration(newValue);
+                  }}
+                />
+                <Box mt={2}>
+                  <Button
+                    color="primary"
+                    variant="contained"
+                    size="large"
+                    onClick={() => {
+                      if (gameState == "running") {
+                        setGameState("paused");
+                        clearInterval(interval);
+                      } else {
+                        setGameState("running");
+                        if (gameState == "stopped") {
+                          model = new SIR_Model(
+                            initialSuspectible,
+                            initialInfected,
+                            infectionRadius,
+                            spreadProbability,
+                            20,
+                            probabilityRecognized,
+                            999999999999
+                          );
+
+                          model.reset();
+                          model.initialize();
+                          setWorldHeight(model.height);
+                          setWorldWidth(model.width);
+                        }
+                        interval = setInterval(
+                          updateModel,
+                          stepDuration * 1000
+                        );
+                      }
                     }}
                   >
-                    <MenuItem value={"unrestricted"}>Unrestricted</MenuItem>
-                    <MenuItem value={"shopping_work"}>
-                      Shopping &amp; Work
-                    </MenuItem>
-                    <MenuItem value={"meet_friends"}>Meet Friends</MenuItem>
-                  </Select>
-                  <Divider />
-                  <Typography variant="overline" gutterBottom>
-                    Step Period (s)
-                  </Typography>
-                  <Slider
-                    valueLabelDisplay="auto"
-                    step={0.1}
-                    marks
-                    min={0.1}
-                    max={2.0}
-                    value={stepDuration}
-                    onChange={(event, newValue) => {
-                      setStepDuration(newValue);
+                    {gameState == "running" ? "Pause" : "Start"}
+                  </Button>
+                  &nbsp;&nbsp;
+                  <Button
+                    color="primary"
+                    variant="contained"
+                    size="large"
+                    onClick={() => {
+                      setGameState("stopped");
+                      clearInterval(interval);
                     }}
-                  />
-                  <Box mt={2}>
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      size="large"
-                      onClick={() => {
-                        if (gameState == "running") {
-                          setGameState("paused");
-                          clearInterval(interval);
-                        } else {
-                          setGameState("running");
-                          if (gameState == "stopped") {
-                            model = new SIR_Model(
-                              initialSuspectible,
-                              initialInfected,
-                              infectionRadius,
-                              spreadProbability,
-                              20,
-                              probabilityRecognized,
-                              999999999999
-                            );
-
-                            model.reset();
-                            model.initialize();
-                            setWorldHeight(model.height);
-                            setWorldWidth(model.width);
-                          }
-                          interval = setInterval(
-                            updateModel,
-                            stepDuration * 1000
-                          );
-                        }
-                      }}
-                    >
-                      {gameState == "running" ? "Pause" : "Start"}
-                    </Button>
-                    &nbsp;&nbsp;
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      size="large"
-                      onClick={() => {
-                        setGameState("stopped");
-                        clearInterval(interval);
-                      }}
-                    >
-                      Reset
-                    </Button>
-                  </Box>
+                  >
+                    Reset
+                  </Button>
                 </Box>
-              </Grid>
-              <Grid item xs={8}>
+              </Box>
+            </Grid>
+            <Grid item xs={8}>
+              <Box
+                height="100%"
+                display="flex"
+                flexDirection="column"
+                overflow="hidden"
+              >
                 <PixiRenderer
                   agentList={agentList}
                   worldWidth={worldWidth}
                   worldHeight={worldWidth}
                   stepDuration={stepDuration}
                 />
-              </Grid>
-            </Grid>
-          </Box>
-          <Box height="40%">
-            <Grid container>
-              <Grid item xs={4}></Grid>
-              <Grid item xs={8}>
-                <Line
-                  ref={chartRef}
-                  data={chartData}
-                  options={{
-                    elements: {
-                      point: {
-                        radius: 0,
+                <Box height="200px">
+                  <Line
+                    ref={chartRef}
+                    data={chartData}
+                    options={{
+                      maintainAspectRatio: false,
+                      elements: {
+                        point: {
+                          radius: 0,
+                        },
                       },
-                    },
-                  }}
-                />
-              </Grid>
+                    }}
+                  />
+                </Box>
+              </Box>
             </Grid>
-          </Box>
+          </Grid>
         </Container>
       </Box>
     </Box>
