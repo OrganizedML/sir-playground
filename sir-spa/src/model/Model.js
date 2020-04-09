@@ -53,6 +53,13 @@ class SIR_Model {
         "afterwork": 41,
         "evening": 47
       }
+      this.schedule_random_activity = {
+        "night": 0.1,
+        "morning": 0.8,
+        "work": 0.3,
+        "afterwork": 2,
+        "evening": 0.8
+      }
     }
     
 

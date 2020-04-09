@@ -36,19 +36,25 @@ class Agent{
         // todo: fix parameters, random, pot and last step
         var empyt_cells = [];
         var potForce = this.model.space.get_potential_force(this);
+        potForce = normalize_2D(potForce);
 
         // random activity
-        if (Math.random() > 0.5) {
-            potForce[0] += this.dx + (Math.random() - 0.5) * 2;
-            potForce[1] += this.dy + (Math.random() - 0.5) * 2;
-        }
+        var random_multiplier = this.model.schedule_random_activity[this.model.current_mode];
         
+        potForce[0] += this.dx + random_multiplier * (Math.random() - 0.5) * 2;
+        potForce[1] += this.dy + random_multiplier * (Math.random() - 0.5) * 2;
+        
+        // normalize Force - maybe scale instead? 0-2?
         potForce = normalize_2D(potForce);
-        this.dx = potForce[0];
-        this.dy = potForce[1];
+        this.dx = potForce[0]; // 0-1
+        this.dy = potForce[1]; // 0-1
 
-        // move only in empty cell - otherwise dont move - testing - todo
+        // TODO UMBAUEN OHNE GRID -> Move, check if overlap, correct movement - left, right, random -dont move after a few tries
+
+        // move only in empty cell
         empyt_cells = this.model.space.get_neighborhood_empty(this.position);
+        
+        // round -> if movement > 0.5 than move
         var new_pos = [Math.round(this.position[0] + potForce[0]), Math.round(this.position[1] + potForce[1])];
         //var valid = empyt_cells.filter(function(value) {value[0] == this.new_pos[0] && value[1] == this.new_pos[1]}, new_pos);
         var valid = false;
@@ -96,7 +102,11 @@ function floor_position(position) {
 
 function normalize_2D(array) {
     var norm = Math.sqrt(Math.pow(array[0], 2) + Math.pow(array[1], 2));
-    return [array[0]/norm, array[1]/norm]
+    if (norm < 0.01) {
+        return [0, 0]
+    } else {
+        return [array[0]/norm, array[1]/norm]
+    }
 }
 
 export {Agent}
