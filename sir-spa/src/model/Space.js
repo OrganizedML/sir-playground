@@ -21,7 +21,8 @@ class Space {
 
     load_world_layout(selection) {
         if (selection == "standard") {
-            this.add_attraction_at([Math.floor(this.width/2), Math.floor(this.width/2)], this.home_multiplier, ["work"], -1); // middle of grid as attractive force)
+            this.add_attraction_at([Math.floor(this.width/3), Math.floor(2*this.width/3)], this.home_multiplier, ["work"], -1, 1);
+            this.add_attraction_at([Math.floor(2*this.width/3), Math.floor(this.width/3)], this.home_multiplier, ["work"], -1, 2);
             this.add_attraction_at([10, this.height-10], 0.25, ["evening","morning"]); // up left
             this.add_attraction_at([this.width-10, this.height-10], 0.25, ["night"], 10); // up right
             this.add_attraction_at([10, 10], 0.25, ["evening","morning"]); // down left        
@@ -62,7 +63,7 @@ class Space {
 
         var uid_list = this.inRange_linked_cell(agent.position, agent.unique_id, agent.model.repulsion_range); // range == infection range for movement
         var pos = this.get_local_repulsion_positions(uid_list);
-        var group = this.agent_list.filter(function(el) {return el[0] === agent.unique_id ;})[3];
+        var current_agent = this.agent_list.filter(function(ag) {return ag[0] == agent.unique_id;})[0];
         
         for (var p of pos) {
             var dist = distance(agent.position, p);
@@ -78,7 +79,7 @@ class Space {
             if (att[2].includes(agent.model.current_mode)) {
                 var dist = distance(agent.position, att[0]);
 
-                if ((dist < att[3] || att[3] === -1) && (group === att[4] || att[4] === -1)) {
+                if ((dist < att[3] || att[3] === -1) && (current_agent[3] === att[4] || att[4] === -1)) {
                     force_x_att += - att[1] * (agent.position[0] - att[0][0])/ dist;
                     force_y_att += - att[1] * (agent.position[1] - att[0][1])/ dist;
                 }
@@ -86,12 +87,11 @@ class Space {
         }
 
         if (force_x_att === 0 && force_y_att === 0) {
-            var home_pos = this.agent_list.filter(function(ag) {return ag[0] == agent.unique_id;})[0];
-            var dist = distance(agent.position, home_pos[2]); // home position
+            var dist = distance(agent.position, current_agent[2]); // home position
             
             if (dist > 0.001) {
-                force_x_att = - this.home_multiplier * (agent.position[0] - home_pos[2][0])/ dist;
-                force_y_att = - this.home_multiplier * (agent.position[1] - home_pos[2][1])/ dist;
+                force_x_att = - this.home_multiplier * (agent.position[0] - current_agent[2][0])/ dist;
+                force_y_att = - this.home_multiplier * (agent.position[1] - current_agent[2][1])/ dist;
             }            
         }
         // normalize  ?
@@ -204,7 +204,7 @@ class Space {
         }
     }
 
-    get_random_position_empty(radius_att_points=8) {
+    get_random_position_empty(radius_att_points=5) {
         do {
             var x = Math.floor((Math.random() * this.width));
             var y = Math.floor((Math.random() * this.height));

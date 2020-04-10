@@ -111,7 +111,7 @@ class SIR_Model {
 
         // register agent
         this.s_list.push(new_agent);
-        this.space.add_agent(new_agent, pos);
+        this.space.add_agent(new_agent, pos, getRandomInt(1,2));
       }
 
       //setup infected agents
@@ -121,7 +121,7 @@ class SIR_Model {
 
         // register agent
         this.i_list.push(new_agent);
-        this.space.add_agent(new_agent, new_agent.home);
+        this.space.add_agent(new_agent, new_agent.home, getRandomInt(1,2));
       }
     }
 
@@ -358,6 +358,12 @@ function range(start, end) {
 
 function Sleep(milliseconds) {
   return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 export {SIR_Model}
