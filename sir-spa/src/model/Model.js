@@ -3,17 +3,6 @@ import { Removed } from "model/agents/R-agent"
 import { Infected } from "model/agents/I-agent"
 import { Space } from "model/Space"
 
-// Todo: movement grid -> continuous
-// distanzen - kontinuerliche längenangaben.
-
-// zeit realer zeitschritt - realistische geschwindigkeit
-// -> energy / life movementt
-
-// potentialfelder - je typ
-// zeitlich anderes verhalten? hotspots aktiv - option nicht default
-
-// Gruppen durchmischung - ähnlicher ausgangsort
-// initial gruppe zuweisen ?
 
 class SIR_Model {
   // agent based SIR-Model
