@@ -345,10 +345,10 @@ function App() {
                 </Box>
               </Box>
             </Grid>
-            <Grid item xs={8}>
+            <Grid item xs={6}>
               <SizeMe monitorHeight>
                 {({ size }) => {
-                  let maxDim = Math.min(size.width, size.height)
+                  let minDim = Math.min(size.width, size.height * 0.7)
                   return (
                     <Box
                       height="100%"
@@ -360,29 +360,33 @@ function App() {
                         agentList={agentList}
                         worldWidth={worldWidth}
                         worldHeight={worldHeight}
-                        renderWidth={maxDim}
-                        renderHeight={maxDim}
+                        renderWidth={minDim}
+                        renderHeight={minDim}
                         stepDuration={stepDuration}
                       />
-
-                      {/* <Line
-                        ref={chartRef}
-                        data={chartData}
-                        height={size.height * 0.1}
-                        options={{
-                          maintainAspectRatio: false,
-                          elements: {
-                            point: {
-                              radius: 0,
+                      {!isNaN(size.height) && !isNaN(size.width) && (
+                        <Line
+                          ref={chartRef}
+                          data={chartData}
+                          height={size.height-minDim}
+                          width={size.width}
+                          options={{
+                            maintainAspectRatio: true,
+                            responsive: false,
+                            elements: {
+                              point: {
+                                radius: 0,
+                              },
                             },
-                          },
-                        }}
-                      /> */}
+                          }}
+                        />
+                      )}
                     </Box>
                   );
                 }}
               </SizeMe>
             </Grid>
+            <Grid item xs={2}>aaaaaaaaaa</Grid>
           </Grid>
         </Container>
       </Box>
