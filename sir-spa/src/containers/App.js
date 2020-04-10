@@ -14,6 +14,7 @@ import {
   Divider,
 } from "@material-ui/core";
 import { PixiRenderer } from "components/PixiRenderer";
+import {TimeDisplay} from "components/TimeDisplay";
 import { Line } from "react-chartjs-2";
 import { SizeMe } from "react-sizeme";
 
@@ -31,6 +32,10 @@ function App() {
   // For chart rendering
   // const [history, setHistory] = useState([]);
   const [chartData, setChartData] = useState({ labels: [], datasets: [] });
+
+  // For time rendering
+  const [time, setTime] = useState("00:00")
+  const [dayPhase, setDayPhase] = useState("day")
 
   // Configuration
   const [gameState, setGameState] = useState("stopped");
@@ -69,6 +74,18 @@ function App() {
     let newRecoveredCount = 0;
 
     let isSimulationEnd = model.step();
+    let hour = model.step_num % model.steps_each_day * (24/model.steps_each_day) 
+    let newTime = new Date()
+    newTime.setSeconds(0)
+    newTime.setMinutes(hour % 1 * 60)
+    newTime.setHours(hour)
+    setTime(newTime.toLocaleTimeString('en-US'))
+
+    setDayPhase(model.current_mode)
+
+
+
+
     let newAgentList = [];
     let newSList = model.s_list.map((agent) => {
       if (agent.infected === true) {
@@ -386,7 +403,7 @@ function App() {
                 }}
               </SizeMe>
             </Grid>
-            <Grid item xs={2}>aaaaaaaaaa</Grid>
+            <Grid item xs={2}><TimeDisplay time={time} mode={dayPhase}/></Grid>
           </Grid>
         </Container>
       </Box>
