@@ -327,7 +327,7 @@ function App() {
                             initialInfected,
                             infectionRadius,
                             spreadProbability,
-                            20,
+                            infectionDuration,
                             probabilityRecognized,
                             999999999999
                           );
