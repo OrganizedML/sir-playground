@@ -15,6 +15,7 @@ import {
 } from "@material-ui/core";
 import { PixiRenderer } from "components/PixiRenderer";
 import { Line } from "react-chartjs-2";
+import { SizeMe } from "react-sizeme";
 
 let interval = null;
 let model = null;
@@ -345,33 +346,42 @@ function App() {
               </Box>
             </Grid>
             <Grid item xs={8}>
-              <Box
-                height="100%"
-                display="flex"
-                flexDirection="column"
-                overflow="hidden"
-              >
-                <PixiRenderer
-                  agentList={agentList}
-                  worldWidth={worldWidth}
-                  worldHeight={worldHeight}
-                  stepDuration={stepDuration}
-                />
-                <Box height="200px">
-                  <Line
-                    ref={chartRef}
-                    data={chartData}
-                    options={{
-                      maintainAspectRatio: false,
-                      elements: {
-                        point: {
-                          radius: 0,
-                        },
-                      },
-                    }}
-                  />
-                </Box>
-              </Box>
+              <SizeMe monitorHeight>
+                {({ size }) => {
+                  let maxDim = Math.min(size.width, size.height)
+                  return (
+                    <Box
+                      height="100%"
+                      display="flex"
+                      flexDirection="column"
+                      overflow="hidden"
+                    >
+                      <PixiRenderer
+                        agentList={agentList}
+                        worldWidth={worldWidth}
+                        worldHeight={worldHeight}
+                        renderWidth={maxDim}
+                        renderHeight={maxDim}
+                        stepDuration={stepDuration}
+                      />
+
+                      {/* <Line
+                        ref={chartRef}
+                        data={chartData}
+                        height={size.height * 0.1}
+                        options={{
+                          maintainAspectRatio: false,
+                          elements: {
+                            point: {
+                              radius: 0,
+                            },
+                          },
+                        }}
+                      /> */}
+                    </Box>
+                  );
+                }}
+              </SizeMe>
             </Grid>
           </Grid>
         </Container>
