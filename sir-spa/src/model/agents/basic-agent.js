@@ -2,12 +2,12 @@ import { Susceptible } from "./S-agent";
 
 class Agent{
     constructor(unique_id, position, model, now_in_center=false,
-        last_pos=undefined, has_infected=0){
+        home=undefined, has_infected=0){
             this.unique_id = unique_id;
             this.position = position;
             this.now_in_center = now_in_center;
             this.model = model;
-            this.last_pos = last_pos;
+            this.home = home;
             this.has_infected = has_infected;
 
             this.dx = (Math.random() - 0.5) * 2;
