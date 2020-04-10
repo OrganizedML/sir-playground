@@ -12,6 +12,8 @@ const renderWidth = 600;
 const renderHeight = 600;
 let elapsedTime = 0.0;
 
+let renderIds = false;
+
 let tickerFunc;
 
 const PixiRenderer = React.memo(
@@ -24,7 +26,9 @@ const PixiRenderer = React.memo(
       });
       if (index === -1) {
         app.stage.removeChild(agents[unique_id].sprite);
-        app.stage.removeChild(agents[unique_id].text);
+        if (renderIds) {
+          app.stage.removeChild(agents[unique_id].text);
+        }
         delete agents[unique_id];
       } else {
         agents[unique_id].oldPos = agents[unique_id].agent.position;
@@ -39,22 +43,24 @@ const PixiRenderer = React.memo(
         let text;
         if (agent.unique_id in agents) {
           sprite = agents[agent.unique_id].sprite;
-          text = agents[agent.unique_id].text;
+          if (renderIds) {
+            text = agents[agent.unique_id].text;
+          }
         } else {
           sprite = new PIXI.Sprite(susceptibleTex);
 
           sprite.width = renderWidth / worldWidth;
           sprite.height = renderHeight / worldHeight;
           app.stage.addChild(sprite);
-
-          text = new PIXI.Text(agent.unique_id.toString(), {
-            fontFamily: "Arial",
-            fontSize: 10,
-            fill: 0x5555ff,
-            align: "center",
-          });
-
-          app.stage.addChild(text);
+          if (renderIds) {
+            text = new PIXI.Text(agent.unique_id.toString(), {
+              fontFamily: "Arial",
+              fontSize: 10,
+              fill: 0x5555ff,
+              align: "center",
+            });
+            app.stage.addChild(text);
+          }
 
           agents[agent.unique_id] = {
             text: text,
@@ -181,9 +187,10 @@ const PixiRenderer = React.memo(
             (agentInfo.agent.position[1] * (renderHeight / worldHeight) -
               agentInfo.oldPos[1] * (renderHeight / worldHeight)) *
               Math.min(elapsedTime / stepDuration, 1.0);
-
-          agentInfo.text.x = agentInfo.sprite.x;
-          agentInfo.text.y = agentInfo.sprite.y + renderHeight / worldHeight;
+          if (renderIds) {
+            agentInfo.text.x = agentInfo.sprite.x;
+            agentInfo.text.y = agentInfo.sprite.y + renderHeight / worldHeight;
+          }
         });
       };
       app.ticker.add(tickerFunc);
