@@ -14,7 +14,9 @@ import {
   Divider,
 } from "@material-ui/core";
 import { PixiRenderer } from "components/PixiRenderer";
-import { Line } from "react-chartjs-2";
+import { TimeDisplay } from "components/TimeDisplay";
+import { LineChart } from "components/LineChart";
+import { SizeMe } from "react-sizeme";
 
 let interval = null;
 let model = null;
@@ -30,6 +32,10 @@ function App() {
   // For chart rendering
   // const [history, setHistory] = useState([]);
   const [chartData, setChartData] = useState({ labels: [], datasets: [] });
+
+  // For time rendering
+  const [time, setTime] = useState("00:00");
+  const [dayPhase, setDayPhase] = useState("day");
 
   // Configuration
   const [gameState, setGameState] = useState("stopped");
@@ -68,6 +74,16 @@ function App() {
     let newRecoveredCount = 0;
 
     let isSimulationEnd = model.step();
+    let hour =
+      (model.step_num % model.steps_each_day) * (24 / model.steps_each_day);
+    let newTime = new Date();
+    newTime.setSeconds(0);
+    newTime.setMinutes((hour % 1) * 60);
+    newTime.setHours(hour);
+    setTime(newTime.toLocaleTimeString("en-US"));
+
+    setDayPhase(model.current_mode);
+
     let newAgentList = [];
     let newSList = model.s_list.map((agent) => {
       if (agent.infected === true) {
@@ -309,7 +325,7 @@ function App() {
                             initialInfected,
                             infectionRadius,
                             spreadProbability,
-                            20,
+                            infectionDuration,
                             probabilityRecognized,
                             999999999999
                           );
@@ -334,6 +350,7 @@ function App() {
                     variant="contained"
                     size="large"
                     onClick={() => {
+                      history = [];
                       setGameState("stopped");
                       clearInterval(interval);
                     }}
@@ -343,34 +360,41 @@ function App() {
                 </Box>
               </Box>
             </Grid>
-            <Grid item xs={8}>
-              <Box
-                height="100%"
-                display="flex"
-                flexDirection="column"
-                overflow="hidden"
-              >
-                <PixiRenderer
-                  agentList={agentList}
-                  worldWidth={worldWidth}
-                  worldHeight={worldWidth}
-                  stepDuration={stepDuration}
-                />
-                <Box height="200px">
-                  <Line
-                    ref={chartRef}
-                    data={chartData}
-                    options={{
-                      maintainAspectRatio: false,
-                      elements: {
-                        point: {
-                          radius: 0,
-                        },
-                      },
-                    }}
-                  />
-                </Box>
-              </Box>
+            <Grid item xs={6}>
+              <SizeMe monitorHeight>
+                {({ size }) => {
+                  let minDim = Math.min(size.width, size.height * 0.7);
+                  return (
+                    <Box
+                      height="100%"
+                      display="flex"
+                      flexDirection="column"
+                      overflow="hidden"
+                    >
+                      <PixiRenderer
+                        agentList={agentList}
+                        worldWidth={worldWidth}
+                        worldHeight={worldHeight}
+                        renderWidth={minDim}
+                        renderHeight={minDim}
+                        stepDuration={stepDuration}
+                      />
+                      {!isNaN(size.height) && !isNaN(size.width) && chartData && (
+                        <LineChart
+                          height={size.height-minDim}
+                          width={size.width}
+                          chartData={chartData}
+                          chartRef={chartRef}
+                          
+                        />
+                      )}
+                    </Box>
+                  );
+                }}
+              </SizeMe>
+            </Grid>
+            <Grid item xs={2}>
+              <TimeDisplay time={time} mode={dayPhase} />
             </Grid>
           </Grid>
         </Container>
