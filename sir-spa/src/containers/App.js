@@ -14,8 +14,8 @@ import {
   Divider,
 } from "@material-ui/core";
 import { PixiRenderer } from "components/PixiRenderer";
-import {TimeDisplay} from "components/TimeDisplay";
-import { Line } from "react-chartjs-2";
+import { TimeDisplay } from "components/TimeDisplay";
+import { LineChart } from "components/LineChart";
 import { SizeMe } from "react-sizeme";
 
 let interval = null;
@@ -34,8 +34,8 @@ function App() {
   const [chartData, setChartData] = useState({ labels: [], datasets: [] });
 
   // For time rendering
-  const [time, setTime] = useState("00:00")
-  const [dayPhase, setDayPhase] = useState("day")
+  const [time, setTime] = useState("00:00");
+  const [dayPhase, setDayPhase] = useState("day");
 
   // Configuration
   const [gameState, setGameState] = useState("stopped");
@@ -74,17 +74,15 @@ function App() {
     let newRecoveredCount = 0;
 
     let isSimulationEnd = model.step();
-    let hour = model.step_num % model.steps_each_day * (24/model.steps_each_day) 
-    let newTime = new Date()
-    newTime.setSeconds(0)
-    newTime.setMinutes(hour % 1 * 60)
-    newTime.setHours(hour)
-    setTime(newTime.toLocaleTimeString('en-US'))
+    let hour =
+      (model.step_num % model.steps_each_day) * (24 / model.steps_each_day);
+    let newTime = new Date();
+    newTime.setSeconds(0);
+    newTime.setMinutes((hour % 1) * 60);
+    newTime.setHours(hour);
+    setTime(newTime.toLocaleTimeString("en-US"));
 
-    setDayPhase(model.current_mode)
-
-
-
+    setDayPhase(model.current_mode);
 
     let newAgentList = [];
     let newSList = model.s_list.map((agent) => {
@@ -365,7 +363,7 @@ function App() {
             <Grid item xs={6}>
               <SizeMe monitorHeight>
                 {({ size }) => {
-                  let minDim = Math.min(size.width, size.height * 0.7)
+                  let minDim = Math.min(size.width, size.height * 0.7);
                   return (
                     <Box
                       height="100%"
@@ -381,21 +379,13 @@ function App() {
                         renderHeight={minDim}
                         stepDuration={stepDuration}
                       />
-                      {!isNaN(size.height) && !isNaN(size.width) && (
-                        <Line
-                          ref={chartRef}
-                          data={chartData}
+                      {!isNaN(size.height) && !isNaN(size.width) && chartData && (
+                        <LineChart
                           height={size.height-minDim}
                           width={size.width}
-                          options={{
-                            maintainAspectRatio: true,
-                            responsive: false,
-                            elements: {
-                              point: {
-                                radius: 0,
-                              },
-                            },
-                          }}
+                          chartData={chartData}
+                          chartRef={chartRef}
+                          
                         />
                       )}
                     </Box>
@@ -403,7 +393,9 @@ function App() {
                 }}
               </SizeMe>
             </Grid>
-            <Grid item xs={2}><TimeDisplay time={time} mode={dayPhase}/></Grid>
+            <Grid item xs={2}>
+              <TimeDisplay time={time} mode={dayPhase} />
+            </Grid>
           </Grid>
         </Container>
       </Box>

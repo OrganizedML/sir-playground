@@ -3,7 +3,7 @@ import { Box, Typography } from "@material-ui/core";
 import DayIcon from "@material-ui/icons/WbSunny";
 import NightIcon from "@material-ui/icons/NightsStay";
 
-const TimeDisplay = ({ time, mode }) => {
+const TimeDisplay = React.memo(({ time, mode }) => {
   let isNight = mode === "night" || mode === "evening";
   return (
     <Box
@@ -19,6 +19,6 @@ const TimeDisplay = ({ time, mode }) => {
       
     </Box>
   );
-};
+});
 
 export { TimeDisplay };
