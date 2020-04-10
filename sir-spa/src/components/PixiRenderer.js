@@ -23,7 +23,8 @@ const PixiRenderer = React.memo(
         return agent.unique_id == unique_id;
       });
       if (index === -1) {
-        app.stage.removeChild(agents[unique_id]);
+        app.stage.removeChild(agents[unique_id].sprite);
+        app.stage.removeChild(agents[unique_id].text);
         delete agents[unique_id];
       } else {
         agents[unique_id].oldPos = agents[unique_id].agent.position;
@@ -184,7 +185,7 @@ const PixiRenderer = React.memo(
           agentInfo.text.x = agentInfo.sprite.x;
           agentInfo.text.y = agentInfo.sprite.y + renderHeight / worldHeight;
         });
-      }
+      };
       app.ticker.add(tickerFunc);
     }, [worldHeight, worldWidth, stepDuration]);
     elapsedTime = 0.0;

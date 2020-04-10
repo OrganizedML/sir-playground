@@ -334,6 +334,7 @@ function App() {
                     variant="contained"
                     size="large"
                     onClick={() => {
+                      history = [];
                       setGameState("stopped");
                       clearInterval(interval);
                     }}
@@ -353,7 +354,7 @@ function App() {
                 <PixiRenderer
                   agentList={agentList}
                   worldWidth={worldWidth}
-                  worldHeight={worldWidth}
+                  worldHeight={worldHeight}
                   stepDuration={stepDuration}
                 />
                 <Box height="200px">
