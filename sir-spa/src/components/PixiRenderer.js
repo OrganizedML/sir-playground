@@ -15,7 +15,7 @@ let renderIds = false;
 
 let tickerFunc;
 
-const PixiRenderer = ({
+const PixiRenderer = React.memo(({
   agentList,
   worldWidth,
   worldHeight,
@@ -209,6 +209,6 @@ const PixiRenderer = ({
   }, [worldHeight, worldWidth, stepDuration, renderHeight, renderWidth]);
   elapsedTime = 0.0;
   return <div ref={stageContainer}></div>;
-};
+});
 
 export { PixiRenderer };
