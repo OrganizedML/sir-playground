@@ -16,23 +16,29 @@ class Space {
 
         // potential fields
         this.attractive_points = new Array();
-
-        this.add_attraction_at([Math.floor(this.width/2), Math.floor(this.width/2)], this.home_multiplier, ["work"], 1); // middle of grid as attractive force)
-        this.add_attraction_at([10, this.height-10], 0.25, ["evening","morning"]); // up left
-        this.add_attraction_at([this.width-10, this.height-10], 0.25, ["night"], 10); // up right
-        this.add_attraction_at([10, 10], 0.25, ["evening","morning"]); // down left        
-        this.add_attraction_at([this.width-10, 10], 0.25, ["evening","morning"]); // down right
+        this.load_world_layout("standard")
     }
 
+    load_world_layout(selection) {
+        if (selection == "standard") {
+            this.add_attraction_at([Math.floor(this.width/2), Math.floor(this.width/2)], this.home_multiplier, ["work"], -1); // middle of grid as attractive force)
+            this.add_attraction_at([10, this.height-10], 0.25, ["evening","morning"]); // up left
+            this.add_attraction_at([this.width-10, this.height-10], 0.25, ["night"], 10); // up right
+            this.add_attraction_at([10, 10], 0.25, ["evening","morning"]); // down left        
+            this.add_attraction_at([this.width-10, 10], 0.25, ["evening","morning"]); // down right
+        } else {
+            // todo
+        }
+    }
 
-    // Linked Cell + Potential Field
-    // each step: update linked cell
-    // each movement: get potential force for each agent
     add_attraction_at(position, multiplier, active_at, influence_range=-1, group=-1) {
         // active_at should be list like ["night", "afterwork"]
         this.attractive_points.push([position, multiplier, active_at, influence_range, group]);// pos + value
     }
 
+    // Linked Cell + Potential Field
+    // each step: update linked cell
+    // each movement: get potential force for each agent
     get_local_repulsion_positions(uid_list) {
         if (uid_list.length > 0) {
             var positions = new Array();
