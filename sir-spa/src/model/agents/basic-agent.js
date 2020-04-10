@@ -2,12 +2,12 @@ import { Susceptible } from "./S-agent";
 
 class Agent{
     constructor(unique_id, position, model, now_in_center=false,
-        last_pos=undefined, has_infected=0){
+        home=undefined, has_infected=0){
             this.unique_id = unique_id;
             this.position = position;
             this.now_in_center = now_in_center;
             this.model = model;
-            this.last_pos = last_pos;
+            this.home = home;
             this.has_infected = has_infected;
 
             this.dx = (Math.random() - 0.5) * 2;
@@ -49,30 +49,15 @@ class Agent{
         this.dx = potForce[0]; // 0-1
         this.dy = potForce[1]; // 0-1
 
-        // TODO UMBAUEN OHNE GRID -> Move, check if overlap, correct movement - left, right, random -dont move after a few tries
-
-        // move only in empty cell
-        empyt_cells = this.model.space.get_neighborhood_empty(this.position);
+        // Move, check if overlap, correct movement - left, right, random -dont move after a few tries
+        // var next_move = this.model.space.get_valid_position_from_potForce(this, potForce);
         
-        // round -> if movement > 0.5 than move
-        var new_pos = [Math.round(this.position[0] + potForce[0]), Math.round(this.position[1] + potForce[1])];
-        //var valid = empyt_cells.filter(function(value) {value[0] == this.new_pos[0] && value[1] == this.new_pos[1]}, new_pos);
-        var valid = false;
-        for (var empty_cell of empyt_cells) {
-            if (empty_cell[0] == new_pos[0] && empty_cell[1] == new_pos[1]) {
-                valid = true;
-                break;
-            }
-        }
-
-        if (valid == 1) {
-            var next_move = new_pos;
-        } else {
-            var next_move = this.position;
-        }
+        // w/o overlap check
+        var next_move = [this.position[0] + potForce[0], this.position[1] + potForce[1]];
+        next_move = this.model.space.correct_boundaries(next_move);
 
         // admin overhead in space - world
-        this.position = floor_position(next_move);
+        this.position = next_move;
         this.model.space.move_agent(this, this.position);
     }
     
