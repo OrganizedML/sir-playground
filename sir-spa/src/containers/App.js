@@ -25,7 +25,7 @@ let history = [];
 
 function App() {
   // For rendering
-  const [agentList, setAgentList] = useState([]);
+  const [worldState, setWorldState] = useState({ agentList: [], hotSpots: [] });
   const [worldWidth, setWorldWidth] = useState(undefined);
   const [worldHeight, setWorldHeight] = useState(undefined);
 
@@ -66,6 +66,17 @@ function App() {
     setWorldHeight(model.height);
     setWorldWidth(model.width);
   }, []);
+
+  useEffect(() => {
+    let newWorldState = { ...worldState };
+    let space = model.space
+
+    let newHotSpots = space.attractive_points.map((attractivePoint) => {
+      return {pos: attractivePoint[0], strength: attractivePoint[1], range: attractivePoint[3]}
+    })
+    newWorldState.hotSpots = newHotSpots
+    setWorldState(newWorldState)
+  }, [model]);
 
   const updateModel = () => {
     let newInfectedCount = 0;
@@ -113,7 +124,9 @@ function App() {
     });
     newAgentList.push(...newRList);
 
-    setAgentList(newAgentList);
+    let newWorldState = { ...worldState };
+    newWorldState.agentList = newAgentList;
+    setWorldState(newWorldState);
     if (isSimulationEnd) {
       clearInterval(interval);
       setGameState("stopped");
@@ -372,22 +385,23 @@ function App() {
                       overflow="hidden"
                     >
                       <PixiRenderer
-                        agentList={agentList}
+                        worldState={worldState}
                         worldWidth={worldWidth}
                         worldHeight={worldHeight}
                         renderWidth={minDim}
                         renderHeight={minDim}
                         stepDuration={stepDuration}
                       />
-                      {!isNaN(size.height) && !isNaN(size.width) && chartData && (
-                        <LineChart
-                          height={size.height-minDim}
-                          width={size.width}
-                          chartData={chartData}
-                          chartRef={chartRef}
-                          
-                        />
-                      )}
+                      {!isNaN(size.height) &&
+                        !isNaN(size.width) &&
+                        chartData && (
+                          <LineChart
+                            height={size.height - minDim}
+                            width={size.width}
+                            chartData={chartData}
+                            chartRef={chartRef}
+                          />
+                        )}
                     </Box>
                   );
                 }}

@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js";
 import React, { useRef, useState, useEffect } from "react";
 import BunnyImage from "./bunny.png";
-import {GlowFilter} from '@pixi/filter-glow';
+import { GlowFilter } from "@pixi/filter-glow";
 
 const agents = {};
 let susceptibleTex;
@@ -18,7 +18,7 @@ let tickerFunc;
 
 const PixiRenderer = React.memo(
   ({
-    agentList,
+    worldState,
     worldWidth,
     worldHeight,
     renderWidth,
@@ -28,7 +28,7 @@ const PixiRenderer = React.memo(
     const stageContainer = useRef(null);
 
     Object.keys(agents).forEach((unique_id) => {
-      let index = agentList.findIndex((agent) => {
+      let index = worldState.agentList.findIndex((agent) => {
         return agent.unique_id == unique_id;
       });
       if (index === -1) {
@@ -41,12 +41,12 @@ const PixiRenderer = React.memo(
         agents[unique_id].oldPos = agents[unique_id].agent.position;
         agents[unique_id].oldState = agents[unique_id].agent.state;
 
-        agents[unique_id].agent = agentList[index];
+        agents[unique_id].agent = worldState.agentList[index];
       }
     });
 
-    if (app && agentList) {
-      agentList.forEach((agent) => {
+    if (app && worldState) {
+      worldState.agentList.forEach((agent) => {
         let sprite;
         let text;
         if (agent.unique_id in agents) {
@@ -82,10 +82,14 @@ const PixiRenderer = React.memo(
           sprite.texture = infectedTex;
           if (agents[agent.unique_id].oldState === "infected_unrecognized") {
             sprite.filters = [
-              new GlowFilter({ distance: 15, outerStrength: 2, color: 0xff0000 }),
+              new GlowFilter({
+                distance: 15,
+                outerStrength: 2,
+                color: 0xff0000,
+              }),
             ];
           } else {
-            sprite.filters = []
+            sprite.filters = [];
           }
         } else if (agent.state == "infected_unrecognized") {
           sprite.texture = infectedUnrecognizedTex;
@@ -123,6 +127,8 @@ const PixiRenderer = React.memo(
     //     });
     //   });
     // }
+
+   
 
     useEffect(() => {
       if (
@@ -216,6 +222,34 @@ const PixiRenderer = React.memo(
       };
       app.ticker.add(tickerFunc);
     }, [worldHeight, worldWidth, stepDuration, renderHeight, renderWidth]);
+
+
+    useEffect(() => {
+      if (app && worldState.hotSpots) {
+        console.log("Render Hotspots");
+
+        worldState.hotSpots.forEach((hotSpot) => {
+          let gr = new PIXI.Graphics();
+          gr.beginFill(0x00ffff, 0.2);
+          gr.lineStyle(0);
+          gr.drawCircle(
+            hotSpot.strength * renderWidth,
+            hotSpot.strength * renderHeight,
+            Math.min(hotSpot.strength * renderWidth, hotSpot.strength * renderHeight)
+          );
+          gr.endFill();
+          let hotSpotTex = app.renderer.generateTexture(gr);
+          let hotSpotSprite = new PIXI.Sprite(hotSpotTex);
+          hotSpotSprite.x = hotSpot.pos[0] * (renderWidth / worldWidth) - (hotSpot.strength * renderWidth) / 2
+          hotSpotSprite.y = hotSpot.pos[1] * (renderHeight / worldHeight) - (hotSpot.strength * renderHeight) / 2
+          
+          hotSpotSprite.width = hotSpot.strength * renderWidth
+          hotSpotSprite.height = hotSpot.strength * renderHeight 
+          app.stage.addChild(hotSpotSprite)
+        });
+      }
+    }, [app, worldState.hotSpots]);
+
     elapsedTime = 0.0;
     return <div ref={stageContainer}></div>;
   }
