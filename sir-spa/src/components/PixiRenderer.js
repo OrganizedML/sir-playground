@@ -80,7 +80,7 @@ const PixiRenderer = React.memo(
         }
         if (agent.state == "infected") {
           sprite.texture = infectedTex;
-          if (agents[agent.unique_id].oldState === "infected_unrecognized") {
+          if (agents[agent.unique_id].oldState !== "infected") {
             sprite.filters = [
               new GlowFilter({
                 distance: 15,
@@ -93,8 +93,30 @@ const PixiRenderer = React.memo(
           }
         } else if (agent.state == "infected_unrecognized") {
           sprite.texture = infectedUnrecognizedTex;
+          if (agents[agent.unique_id].oldState !== "infected_unrecognized") {
+            sprite.filters = [
+              new GlowFilter({
+                distance: 15,
+                outerStrength: 2,
+                color: 0x0000ff,
+              }),
+            ];
+          } else {
+            sprite.filters = [];
+          }
         } else if (agent.state == "recovered") {
           sprite.texture = recoveredTex;
+          if (agents[agent.unique_id].oldState !== "recovered") {
+            sprite.filters = [
+              new GlowFilter({
+                distance: 15,
+                outerStrength: 2,
+                color: 0x00ff00,
+              }),
+            ];
+          } else {
+            sprite.filters = [];
+          }
         } else if (agent.state == "susceptible") {
           sprite.texture = susceptibleTex;
         }

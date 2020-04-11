@@ -12,6 +12,8 @@ import {
   Select,
   Button,
   Divider,
+  FormControlLabel,
+  Switch,
 } from "@material-ui/core";
 import { PixiRenderer } from "components/PixiRenderer";
 import { TimeDisplay } from "components/TimeDisplay";
@@ -43,7 +45,7 @@ function App() {
   const [initialSuspectible, setInitialSuspectible] = useState(200);
   const [probabilityRecognized, setProbabilityRecognized] = useState(0.3);
   const [infectionRadius, setInfectionRadius] = useState(2);
-  const [spreadProbability, setSpreadProbability] = useState(0.2);
+  const [spreadProbability, setSpreadProbability] = useState(0.01);
   const [infectionDuration, setInfectionDuration] = useState(10);
   const [profile, setProfile] = useState("unrestricted");
   const [stepDuration, setStepDuration] = useState(0.5);
@@ -69,13 +71,17 @@ function App() {
 
   useEffect(() => {
     let newWorldState = { ...worldState };
-    let space = model.space
+    let space = model.space;
 
     let newHotSpots = space.attractive_points.map((attractivePoint) => {
-      return {pos: attractivePoint[0], strength: attractivePoint[1], range: attractivePoint[3]}
-    })
-    newWorldState.hotSpots = newHotSpots
-    setWorldState(newWorldState)
+      return {
+        pos: attractivePoint[0],
+        strength: attractivePoint[1],
+        range: attractivePoint[3],
+      };
+    });
+    newWorldState.hotSpots = newHotSpots;
+    setWorldState(newWorldState);
   }, [model]);
 
   const updateModel = () => {
@@ -258,20 +264,6 @@ function App() {
                     setInfectionRadius(newValue);
                   }}
                 />
-                <Typography variant="overline" gutterBottom>
-                  Spread Probability
-                </Typography>
-                <Slider
-                  valueLabelDisplay="auto"
-                  step={0.05}
-                  marks
-                  min={0}
-                  max={1}
-                  value={spreadProbability}
-                  onChange={(event, newValue) => {
-                    setSpreadProbability(newValue);
-                  }}
-                />
 
                 <Typography variant="overline" gutterBottom>
                   Mean Infection Duration
@@ -287,6 +279,27 @@ function App() {
                     setInfectionDuration(newValue);
                   }}
                 />
+
+                <Typography variant="overline" gutterBottom>
+                  Spread Probability
+                </Typography>
+                <br />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={spreadProbability >= 0.1}
+                      onChange={(event) => {
+                        if (event.target.checked) {
+                          setSpreadProbability(0.1);
+                        } else {
+                          setSpreadProbability(0.01);
+                        }
+                      }}
+                    />
+                  }
+                  label="Increased Probability"
+                />
+                <br />
 
                 <Typography variant="overline" gutterBottom>
                   Profile
