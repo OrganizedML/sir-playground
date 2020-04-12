@@ -10,6 +10,7 @@ let infectedUnrecognizedTex;
 let recoveredTex;
 let app;
 let initialRatio;
+const renderingSize = 600
 
 let elapsedTime = 0.0;
 
@@ -22,19 +23,19 @@ const PixiRenderer = React.memo(
     worldState,
     worldWidth,
     worldHeight,
-    renderWidth,
-    renderHeight,
+    currentWidth,
+    currentHeight,
     stepDuration,
   }) => {
     const stageContainer = useRef(null);
 
     // Initial app setup and resize
     useEffect(() => {
-      if (renderHeight && renderWidth && !app) {
-        initialRatio = renderHeight / renderWidth;
+      if (currentHeight && currentWidth && !app) {
+        initialRatio = currentHeight / currentWidth;
         app = new PIXI.Application({
-          width: renderWidth,
-          height: renderHeight,
+          width: renderingSize,
+          height: renderingSize,
           transparent: true,
         });
 
@@ -44,9 +45,9 @@ const PixiRenderer = React.memo(
         gr.beginFill(0x000000);
         gr.lineStyle(0);
         gr.drawCircle(
-          renderWidth / worldWidth,
-          renderHeight / worldHeight,
-          Math.min(renderWidth / worldWidth, renderHeight / worldHeight)
+          renderingSize / worldWidth,
+          renderingSize / worldHeight,
+          Math.min(renderingSize / worldWidth, renderingSize / worldHeight)
         );
         gr.endFill();
 
@@ -56,9 +57,9 @@ const PixiRenderer = React.memo(
         gr.beginFill(0xff0000);
         gr.lineStyle(0);
         gr.drawCircle(
-          renderWidth / worldWidth,
-          renderHeight / worldHeight,
-          Math.min(renderWidth / worldWidth, renderHeight / worldHeight)
+          renderingSize / worldWidth,
+          renderingSize / worldHeight,
+          Math.min(renderingSize / worldWidth, renderingSize / worldHeight)
         );
         gr.endFill();
 
@@ -68,9 +69,9 @@ const PixiRenderer = React.memo(
         gr.beginFill(0x0000ff);
         gr.lineStyle(0);
         gr.drawCircle(
-          renderWidth / worldWidth,
-          renderHeight / worldHeight,
-          Math.min(renderWidth / worldWidth, renderHeight / worldHeight)
+          renderingSize / worldWidth,
+          renderingSize / worldHeight,
+          Math.min(renderingSize / worldWidth, renderingSize / worldHeight)
         );
         gr.endFill();
 
@@ -80,29 +81,28 @@ const PixiRenderer = React.memo(
         gr.beginFill(0x00ff00);
         gr.lineStyle(0);
         gr.drawCircle(
-          renderWidth / worldWidth,
-          renderHeight / worldHeight,
-          Math.min(renderWidth / worldWidth, renderHeight / worldHeight)
+          renderingSize / worldWidth,
+          renderingSize / worldHeight,
+          Math.min(renderingSize / worldWidth, renderingSize / worldHeight)
         );
         gr.endFill();
 
         recoveredTex = app.renderer.generateTexture(gr);
       }
-      if (app && renderHeight && renderWidth) {
-        console.log(renderHeight)
+      if (app && currentHeight && currentWidth ) {
         let w;
         let h;
-        if (renderWidth / renderHeight >= initialRatio) {
-          w = renderHeight * initialRatio;
-          h = renderHeight;
+        if (currentHeight / currentWidth >= initialRatio) {
+          w = currentWidth * initialRatio;
+          h = currentHeight;
         } else {
-          w = renderWidth;
-          h = renderWidth / initialRatio;
+          w = currentWidth;
+          h = currentHeight / initialRatio;
         }
         app.renderer.view.style.width = w + "px";
         app.renderer.view.style.height = h + "px";
       }
-    }, [renderHeight, renderWidth]);
+    }, [currentHeight, currentWidth]);
 
     // Game loop setup
     useEffect(() => {
@@ -111,12 +111,10 @@ const PixiRenderer = React.memo(
         !worldHeight ||
         !worldWidth ||
         !stepDuration ||
-        isNaN(renderHeight) ||
-        isNaN(renderWidth)
+        isNaN(renderingSize)
       ) {
         return;
       }
-
       app.ticker.remove(tickerFunc);
       tickerFunc = (deltaTime) => {
         elapsedTime += deltaTime / PIXI.settings.TARGET_FPMS / 1000;
@@ -124,24 +122,24 @@ const PixiRenderer = React.memo(
           let agentInfo = agents[unique_id];
 
           agentInfo.sprite.x =
-            agentInfo.oldPos[0] * (renderWidth / worldWidth) +
-            (agentInfo.agent.position[0] * (renderWidth / worldWidth) -
-              agentInfo.oldPos[0] * (renderWidth / worldWidth)) *
+            agentInfo.oldPos[0] * (renderingSize / worldWidth) +
+            (agentInfo.agent.position[0] * (renderingSize / worldWidth) -
+              agentInfo.oldPos[0] * (renderingSize / worldWidth)) *
               Math.min(elapsedTime / stepDuration, 1.0);
           agentInfo.sprite.y =
-            agentInfo.oldPos[1] * (renderHeight / worldHeight) +
-            (agentInfo.agent.position[1] * (renderHeight / worldHeight) -
-              agentInfo.oldPos[1] * (renderHeight / worldHeight)) *
+            agentInfo.oldPos[1] * (renderingSize / worldHeight) +
+            (agentInfo.agent.position[1] * (renderingSize / worldHeight) -
+              agentInfo.oldPos[1] * (renderingSize / worldHeight)) *
               Math.min(elapsedTime / stepDuration, 1.0);
 
           if (renderIds) {
             agentInfo.text.x = agentInfo.sprite.x;
-            agentInfo.text.y = agentInfo.sprite.y + renderHeight / worldHeight;
+            agentInfo.text.y = agentInfo.sprite.y + renderingSize / worldHeight;
           }
         });
       };
       app.ticker.add(tickerFunc);
-    }, [app, worldHeight, worldWidth, stepDuration, renderHeight, renderWidth]);
+    }, [app, worldHeight, worldWidth, stepDuration]);
 
     // Initial world state setup
     useEffect(() => {
@@ -153,29 +151,29 @@ const PixiRenderer = React.memo(
           gr.beginFill(0x00ffff, 0.2);
           gr.lineStyle(0);
           gr.drawCircle(
-            hotSpot.strength * renderWidth,
-            hotSpot.strength * renderHeight,
+            hotSpot.strength * renderingSize,
+            hotSpot.strength * renderingSize,
             Math.min(
-              hotSpot.strength * renderWidth,
-              hotSpot.strength * renderHeight
+              hotSpot.strength * renderingSize,
+              hotSpot.strength * renderingSize
             )
           );
           gr.endFill();
           let hotSpotTex = app.renderer.generateTexture(gr);
           let hotSpotSprite = new PIXI.Sprite(hotSpotTex);
           hotSpotSprite.x =
-            hotSpot.pos[0] * (renderWidth / worldWidth) -
-            (hotSpot.strength * renderWidth) / 2;
+            hotSpot.pos[0] * (renderingSize / worldWidth) -
+            (hotSpot.strength * renderingSize) / 2;
           hotSpotSprite.y =
-            hotSpot.pos[1] * (renderHeight / worldHeight) -
-            (hotSpot.strength * renderHeight) / 2;
+            hotSpot.pos[1] * (renderingSize / worldHeight) -
+            (hotSpot.strength * renderingSize) / 2;
 
-          hotSpotSprite.width = hotSpot.strength * renderWidth;
-          hotSpotSprite.height = hotSpot.strength * renderHeight;
+          hotSpotSprite.width = hotSpot.strength * renderingSize;
+          hotSpotSprite.height = hotSpot.strength * renderingSize;
           app.stage.addChild(hotSpotSprite);
         });
       }
-    }, [app, worldState.hotSpots]);
+    }, [app]);
 
     // Updates in every rerender...
     Object.keys(agents).forEach((unique_id) => {
@@ -208,8 +206,8 @@ const PixiRenderer = React.memo(
         } else {
           sprite = new PIXI.Sprite(susceptibleTex);
 
-          sprite.width = renderWidth / worldWidth;
-          sprite.height = renderHeight / worldHeight;
+          sprite.width = renderingSize / worldWidth;
+          sprite.height = renderingSize / worldHeight;
           app.stage.addChild(sprite);
           if (renderIds) {
             text = new PIXI.Text(agent.unique_id.toString(), {

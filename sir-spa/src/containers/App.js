@@ -26,12 +26,16 @@ let model = null;
 let history = [];
 
 function App() {
-
   // For rendering
-  const [worldState, setWorldState] = useState({ agentList: [], hotSpots: [], chartData: { labels: [], datasets: [] }, time: "00:00", dayPhase: "day"});
+  const [worldState, setWorldState] = useState({
+    agentList: [],
+    hotSpots: [],
+    chartData: { labels: [], datasets: [] },
+    time: "00:00",
+    dayPhase: "day",
+  });
   const [worldWidth, setWorldWidth] = useState(undefined);
   const [worldHeight, setWorldHeight] = useState(undefined);
-
 
   // Configuration
   const [gameState, setGameState] = useState("stopped");
@@ -79,7 +83,6 @@ function App() {
   }, [model]);
 
   const updateModel = () => {
-
     let newWorldState = { ...worldState };
 
     let newInfectedCount = 0;
@@ -127,7 +130,6 @@ function App() {
     });
     newAgentList.push(...newRList);
 
-    
     newWorldState.agentList = newAgentList;
     if (isSimulationEnd) {
       clearInterval(interval);
@@ -188,7 +190,7 @@ function App() {
       labels: newLabels,
       datasets: [newIDataset, newRDataset, newSDataset],
     };
-    newWorldState.chartData = newChartData
+    newWorldState.chartData = newChartData;
 
     setWorldState(newWorldState);
   };
@@ -398,15 +400,15 @@ function App() {
                         worldState={worldState}
                         worldWidth={worldWidth}
                         worldHeight={worldHeight}
-                        renderWidth={minDim}
-                        renderHeight={minDim}
+                        currentWidth={minDim}
+                        currentHeight={minDim}
                         stepDuration={stepDuration}
                       />
                       {!isNaN(size.height) &&
                         !isNaN(size.width) &&
                         worldState.chartData && (
                           <LineChart
-                            height={size.height - minDim}
+                            height={size.height - minDim - 10}
                             width={size.width}
                             chartData={worldState.chartData}
                             chartRef={chartRef}
