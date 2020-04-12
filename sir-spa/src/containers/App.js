@@ -26,7 +26,6 @@ let model = null;
 let history = [];
 
 function App() {
-  console.log("rerender")
 
   // For rendering
   const [worldState, setWorldState] = useState({ agentList: [], hotSpots: [], chartData: { labels: [], datasets: [] }, time: "00:00", dayPhase: "day"});

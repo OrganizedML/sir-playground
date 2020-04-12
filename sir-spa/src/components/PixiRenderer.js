@@ -9,6 +9,7 @@ let infectedTex;
 let infectedUnrecognizedTex;
 let recoveredTex;
 let app;
+let initialRatio;
 
 let elapsedTime = 0.0;
 
@@ -27,9 +28,10 @@ const PixiRenderer = React.memo(
   }) => {
     const stageContainer = useRef(null);
 
-    // Initial app setup
+    // Initial app setup and resize
     useEffect(() => {
-      if (renderHeight && renderWidth) {
+      if (renderHeight && renderWidth && !app) {
+        initialRatio = renderHeight / renderWidth;
         app = new PIXI.Application({
           width: renderWidth,
           height: renderHeight,
@@ -85,6 +87,20 @@ const PixiRenderer = React.memo(
         gr.endFill();
 
         recoveredTex = app.renderer.generateTexture(gr);
+      }
+      if (app && renderHeight && renderWidth) {
+        console.log(renderHeight)
+        let w;
+        let h;
+        if (renderWidth / renderHeight >= initialRatio) {
+          w = renderHeight * initialRatio;
+          h = renderHeight;
+        } else {
+          w = renderWidth;
+          h = renderWidth / initialRatio;
+        }
+        app.renderer.view.style.width = w + "px";
+        app.renderer.view.style.height = h + "px";
       }
     }, [renderHeight, renderWidth]);
 
