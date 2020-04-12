@@ -10,23 +10,23 @@ class Space {
         this.ll = new Array();
         this.ll[0] = [-1, -1, [0, 0]];
 
-        this.home_multiplier = 0.25;
-        this.center_multiplier = 0.25;
+        this.home_multiplier = 0.75;
+        this.work_multiplier = 1;
         this.repulsion_force_multiplier = 2;
 
         // potential fields
         this.attractive_points = new Array();
-        this.load_world_layout("standard")
+        this.load_world_layout("work")
     }
 
     load_world_layout(selection) {
-        if (selection == "standard") {
-            this.add_attraction_at([Math.floor(this.width/3), Math.floor(2*this.width/3)], this.home_multiplier, ["work"], -1, 1);
-            this.add_attraction_at([Math.floor(2*this.width/3), Math.floor(this.width/3)], this.home_multiplier, ["work"], -1, 2);
-            this.add_attraction_at([10, this.height-10], 0.25, ["evening","morning"]); // up left
-            this.add_attraction_at([this.width-10, this.height-10], 0.25, ["night"], 10); // up right
-            this.add_attraction_at([10, 10], 0.25, ["evening","morning"]); // down left        
-            this.add_attraction_at([this.width-10, 10], 0.25, ["evening","morning"]); // down right
+        if (selection == "work") {
+            this.add_attraction_at([Math.floor(this.width/5), Math.floor(4*this.width/5)], this.work_multiplier, ["work"], -1, 1);
+            this.add_attraction_at([Math.floor(4*this.width/5), Math.floor(this.width/5)], this.work_multiplier, ["work"], -1, 2);
+            this.add_attraction_at([Math.floor(4*this.width/5), Math.floor(4*this.width/5)], this.work_multiplier, ["afterwork","evening"], 10, -1); // down right
+            //this.add_attraction_at([this.width-10, this.height-10], 0.25, ["night"], 10); // up right
+            //this.add_attraction_at([10, 10], 0.25, ["evening","morning"], 10); // down left        
+            //this.add_attraction_at([this.width-10, 10], 0.25, ["evening","morning"], 3); // down right
         } else {
             // todo
         }
@@ -89,12 +89,15 @@ class Space {
         if (force_x_att === 0 && force_y_att === 0) {
             var dist = distance(agent.position, current_agent[2]); // home position
             
-            if (dist > 0.001) {
+            if (dist > 0.001 && !agent.model.stay_at_home) {
                 force_x_att = - this.home_multiplier * (agent.position[0] - current_agent[2][0])/ dist;
                 force_y_att = - this.home_multiplier * (agent.position[1] - current_agent[2][1])/ dist;
             }            
         }
-        // normalize  ?
+        if (agent.model.stronger_repulsion) {
+            beta += beta;
+        }
+
         var grad_x = alpha*force_x_att - beta*force_x_rep;
         var grad_y = alpha*force_y_att - beta*force_y_rep;
 
@@ -186,6 +189,11 @@ class Space {
     //
     add_agent(agent, home, group=-1) {       
         this.agent_list.push([agent.unique_id, agent.position, home, group])
+    }
+
+    get_agent_attributes(agent) {
+        var filtered = this.agent_list.filter(function(value, index, arr){ return value[0] == agent.unique_id;});
+        return filtered
     }
 
     remove_agent(agent) {

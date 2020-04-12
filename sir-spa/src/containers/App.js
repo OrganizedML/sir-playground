@@ -75,7 +75,7 @@ function App() {
       return {
         pos: attractivePoint[0],
         strength: attractivePoint[1],
-        range: attractivePoint[3],
+        range: attractivePoint[4  ],
       };
     });
     newWorldState.hotSpots = newHotSpots;

@@ -10,6 +10,8 @@ class Infected extends Agent {
       this.infected = true;
       this.steps_since_infection = steps_since_infection;
       this.className = "Infected";
+
+      this.duration = this.model.duration_mean + getRandomInt(-1, 1);
     }
     
     
@@ -18,7 +20,7 @@ class Infected extends Agent {
         var to_r = -1
 
         // interact agents
-        if (Math.floor(this.steps_since_infection / this.model.steps_each_day) > this.model.duration_mean) {
+        if (Math.floor(this.steps_since_infection / this.model.steps_each_day) > this.duration) {
             to_r = this.unique_id
 
         } else {
@@ -36,5 +38,12 @@ class Infected extends Agent {
     }
 
 }
+
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
 
 export { Infected }
