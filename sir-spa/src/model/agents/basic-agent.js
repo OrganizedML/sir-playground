@@ -36,11 +36,11 @@ class Agent{
         // todo: fix parameters, random, pot and last step
         var potForce = this.model.space.get_potential_force(this);
         potForce = normalize_2D(potForce);
-
+                    
         // random activity
         var random_multiplier = this.model.schedule_random_activity[this.model.current_mode];
         var schedule_speed = this.model.schedule_speed[this.model.current_mode];
-        if (!(NAND(this.infected, this.model.stay_at_home))) {
+        if (!(NAND(this.className == "Infected", this.model.stay_at_home))) {
             random_multiplier = 0;
             schedule_speed = 0.5;
         } else if (this.model.stronger_repulsion) {

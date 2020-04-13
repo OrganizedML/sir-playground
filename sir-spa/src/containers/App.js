@@ -18,6 +18,8 @@ import { PixiRenderer } from "components/PixiRenderer";
 import { TimeDisplay } from "components/TimeDisplay";
 import { LineChart } from "components/LineChart";
 import { SizeMe } from "react-sizeme";
+// setup Google Analytics
+import ReactGA from 'react-ga';
 
 let interval = null;
 let model = null;
@@ -25,6 +27,8 @@ let model = null;
 let history = [];
 
 function App() {
+  // setup Google Analytics
+  ReactGA.initialize('UA-161194303-3');
   // For rendering
   const [worldState, setWorldState] = useState({
     agentList: [],
@@ -33,15 +37,18 @@ function App() {
     time: "00:00",
     dayPhase: "day",
     state: "stopped",
+    day: 0,
+    R: 1
   });
 
   const [worldWidth, setWorldWidth] = useState(undefined);
   const [worldHeight, setWorldHeight] = useState(undefined);
 
   // Configuration
-  const [initialInfected, setInitialInfected] = useState(5);
-  const [initialSuspectible, setInitialSuspectible] = useState(200);
-  const [probabilityRecognized, setProbabilityRecognized] = useState(0.3);
+  const [gameState, setGameState] = useState("stopped");
+  const [initialInfected, setInitialInfected] = useState(3);
+  const [initialSuspectible, setInitialSuspectible] = useState(100);
+  const [probabilityRecognized, setProbabilityRecognized] = useState(0.5);
   const [infectionRadius, setInfectionRadius] = useState(2);
   const [spreadProbability, setSpreadProbability] = useState(0.01);
   const [strongerRepulsion, setStrongerRepulsion] = useState(false);
@@ -49,7 +56,7 @@ function App() {
   const [stayAtHomeAll, setStayAtHomeAll] = useState(false);
   const [infectionDuration, setInfectionDuration] = useState(5);
   const [profile, setProfile] = useState("unrestricted");
-  const [stepDuration, setStepDuration] = useState(0.5);
+  const [stepDuration, setStepDuration] = useState(0.3);
 
   const chartRef = useRef(null);
 
@@ -111,6 +118,8 @@ function App() {
         newWorldState.time = newTime.toLocaleTimeString("en-US");
 
         newWorldState.dayPhase = model.current_mode;
+        newWorldState.day = model.day;
+        newWorldState.R = model.R_array[-1];
 
         let newAgentList = [];
         let newSList = model.s_list.map((agent) => {
@@ -498,11 +507,8 @@ function App() {
                 </SizeMe>
               </Grid>
               <Grid item xs={2}>
-                <TimeDisplay
-                  time={worldState.time}
-                  mode={worldState.dayPhase}
-                />
-              </Grid>
+              <TimeDisplay time={worldState.time} mode={worldState.dayPhase} day={worldState.day} R={worldState.R}/>
+            </Grid>
             </Grid>
           </Box>
           <Box height="5%" display="flex" justifyContent="center">
