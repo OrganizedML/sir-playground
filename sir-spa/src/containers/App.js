@@ -34,6 +34,8 @@ function App() {
     time: "00:00",
     dayPhase: "day",
     state: "stopped",
+    day: 0,
+    R: 1
   });
 
   const [worldWidth, setWorldWidth] = useState(undefined);
@@ -113,6 +115,8 @@ function App() {
         newWorldState.time = newTime.toLocaleTimeString("en-US");
 
         newWorldState.dayPhase = model.current_mode;
+        newWorldState.day = model.day;
+        newWorldState.R = model.R_array[-1];
 
         let newAgentList = [];
         let newSList = model.s_list.map((agent) => {
@@ -515,7 +519,7 @@ function App() {
               </SizeMe>
             </Grid>
             <Grid item xs={2}>
-              <TimeDisplay time={worldState.time} mode={worldState.dayPhase} />
+              <TimeDisplay time={worldState.time} mode={worldState.dayPhase} day={worldState.day} R={worldState.R}/>
             </Grid>
           </Grid>
         </Container>
