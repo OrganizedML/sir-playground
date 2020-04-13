@@ -19,6 +19,8 @@ import { PixiRenderer } from "components/PixiRenderer";
 import { TimeDisplay } from "components/TimeDisplay";
 import { LineChart } from "components/LineChart";
 import { SizeMe } from "react-sizeme";
+// setup Google Analytics
+import ReactGA from 'react-ga';
 
 let interval = null;
 let model = null;
@@ -26,6 +28,8 @@ let model = null;
 let history = [];
 
 function App() {
+  // setup Google Analytics
+  ReactGA.initialize('UA-161194303-3');
   // For rendering
   const [worldState, setWorldState] = useState({
     agentList: [],
