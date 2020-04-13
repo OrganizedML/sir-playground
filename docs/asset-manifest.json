@@ -1,0 +1,26 @@
+{
+  "files": {
+    "main.css": "/static/css/main.3e142e2c.chunk.css",
+    "main.js": "/static/js/main.3b25fabd.chunk.js",
+    "main.js.map": "/static/js/main.3b25fabd.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.78a64dcc.js",
+    "runtime-main.js.map": "/static/js/runtime-main.78a64dcc.js.map",
+    "static/js/2.6022a228.chunk.js": "/static/js/2.6022a228.chunk.js",
+    "static/js/2.6022a228.chunk.js.map": "/static/js/2.6022a228.chunk.js.map",
+    "index.html": "/index.html",
+    "precache-manifest.6f94a304448ad301f75196692abce35b.js": "/precache-manifest.6f94a304448ad301f75196692abce35b.js",
+    "service-worker.js": "/service-worker.js",
+    "static/css/main.3e142e2c.chunk.css.map": "/static/css/main.3e142e2c.chunk.css.map",
+    "static/js/2.6022a228.chunk.js.LICENSE.txt": "/static/js/2.6022a228.chunk.js.LICENSE.txt",
+    "static/media/icons8-business-buildings.svg": "/static/media/icons8-business-buildings.d40fc481.svg",
+    "static/media/icons8-manufacturing.svg": "/static/media/icons8-manufacturing.6a1458e1.svg",
+    "static/media/icons8-organization.svg": "/static/media/icons8-organization.4b917871.svg",
+    "static/media/icons8-park-with-street-light.svg": "/static/media/icons8-park-with-street-light.9024a2d1.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.78a64dcc.js",
+    "static/js/2.6022a228.chunk.js",
+    "static/css/main.3e142e2c.chunk.css",
+    "static/js/main.3b25fabd.chunk.js"
+  ]
+}
