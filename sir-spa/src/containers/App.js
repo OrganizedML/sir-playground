@@ -39,17 +39,17 @@ function App() {
 
   // Configuration
   const [gameState, setGameState] = useState("stopped");
-  const [initialInfected, setInitialInfected] = useState(5);
-  const [initialSuspectible, setInitialSuspectible] = useState(200);
-  const [probabilityRecognized, setProbabilityRecognized] = useState(0.3);
+  const [initialInfected, setInitialInfected] = useState(3);
+  const [initialSuspectible, setInitialSuspectible] = useState(100);
+  const [probabilityRecognized, setProbabilityRecognized] = useState(0.5);
   const [infectionRadius, setInfectionRadius] = useState(2);
   const [spreadProbability, setSpreadProbability] = useState(0.01);
   const [strongerRepulsion, setStrongerRepulsion] = useState(false);
   const [stayAtHome, setStayAtHome] = useState(false); 
   const [stayAtHomeAll, setStayAtHomeAll] = useState(false);
-  const [infectionDuration, setInfectionDuration] = useState(10);
+  const [infectionDuration, setInfectionDuration] = useState(5);
   const [profile, setProfile] = useState("unrestricted");
-  const [stepDuration, setStepDuration] = useState(0.5);
+  const [stepDuration, setStepDuration] = useState(0.3);
 
   const chartRef = useRef(null);
 
@@ -236,7 +236,7 @@ function App() {
                   step={25}
                   marks
                   min={25}
-                  max={500}
+                  max={300}
                   value={initialSuspectible}
                   onChange={(event, newValue) => {
                     setInitialSuspectible(newValue);
