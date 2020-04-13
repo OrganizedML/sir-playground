@@ -1,23 +1,23 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "c053ac4cf41ec14724f64c236cf05594",
+    "revision": "c72aed35bda83964ac9e5549e2f3a8dd",
     "url": "/sir-playground/index.html"
   },
   {
-    "revision": "0d07cf3326703159cf2d",
-    "url": "/sir-playground/static/css/main.abbe9163.chunk.css"
+    "revision": "3d686a540a57732dc672",
+    "url": "/sir-playground/static/css/main.3e142e2c.chunk.css"
   },
   {
-    "revision": "4263d73c660316ab8937",
-    "url": "/sir-playground/static/js/2.c10915f8.chunk.js"
+    "revision": "e5e7f5b9f4043b364047",
+    "url": "/sir-playground/static/js/2.a11b2646.chunk.js"
   },
   {
     "revision": "a224ffb4555a8b1614472d94edb9cd0d",
-    "url": "/sir-playground/static/js/2.c10915f8.chunk.js.LICENSE.txt"
+    "url": "/sir-playground/static/js/2.a11b2646.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "0d07cf3326703159cf2d",
-    "url": "/sir-playground/static/js/main.216af7b3.chunk.js"
+    "revision": "3d686a540a57732dc672",
+    "url": "/sir-playground/static/js/main.78e665d5.chunk.js"
   },
   {
     "revision": "859fd6cfb9164bdc7071",
