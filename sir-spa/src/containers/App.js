@@ -12,6 +12,8 @@ import {
   Select,
   Button,
   Divider,
+  FormControlLabel,
+  Switch,
 } from "@material-ui/core";
 import { PixiRenderer } from "components/PixiRenderer";
 import { TimeDisplay } from "components/TimeDisplay";
@@ -25,17 +27,15 @@ let history = [];
 
 function App() {
   // For rendering
-  const [agentList, setAgentList] = useState([]);
+  const [worldState, setWorldState] = useState({
+    agentList: [],
+    hotSpots: [],
+    chartData: { labels: [], datasets: [] },
+    time: "00:00",
+    dayPhase: "day",
+  });
   const [worldWidth, setWorldWidth] = useState(undefined);
   const [worldHeight, setWorldHeight] = useState(undefined);
-
-  // For chart rendering
-  // const [history, setHistory] = useState([]);
-  const [chartData, setChartData] = useState({ labels: [], datasets: [] });
-
-  // For time rendering
-  const [time, setTime] = useState("00:00");
-  const [dayPhase, setDayPhase] = useState("day");
 
   // Configuration
   const [gameState, setGameState] = useState("stopped");
@@ -43,7 +43,7 @@ function App() {
   const [initialSuspectible, setInitialSuspectible] = useState(200);
   const [probabilityRecognized, setProbabilityRecognized] = useState(0.3);
   const [infectionRadius, setInfectionRadius] = useState(2);
-  const [spreadProbability, setSpreadProbability] = useState(0.2);
+  const [spreadProbability, setSpreadProbability] = useState(0.01);
   const [infectionDuration, setInfectionDuration] = useState(10);
   const [profile, setProfile] = useState("unrestricted");
   const [stepDuration, setStepDuration] = useState(0.5);
@@ -67,7 +67,24 @@ function App() {
     setWorldWidth(model.width);
   }, []);
 
+  useEffect(() => {
+    let newWorldState = { ...worldState };
+    let space = model.space;
+
+    let newHotSpots = space.attractive_points.map((attractivePoint) => {
+      return {
+        pos: attractivePoint[0],
+        strength: attractivePoint[1],
+        range: attractivePoint[3],
+      };
+    });
+    newWorldState.hotSpots = newHotSpots;
+    setWorldState(newWorldState);
+  }, [model]);
+
   const updateModel = () => {
+    let newWorldState = { ...worldState };
+
     let newInfectedCount = 0;
     let newInfectedUnrecognizedCount = 0;
     let newSusceptibleCount = 0;
@@ -80,9 +97,9 @@ function App() {
     newTime.setSeconds(0);
     newTime.setMinutes((hour % 1) * 60);
     newTime.setHours(hour);
-    setTime(newTime.toLocaleTimeString("en-US"));
+    newWorldState.time = newTime.toLocaleTimeString("en-US");
 
-    setDayPhase(model.current_mode);
+    newWorldState.dayPhase = model.current_mode;
 
     let newAgentList = [];
     let newSList = model.s_list.map((agent) => {
@@ -113,7 +130,7 @@ function App() {
     });
     newAgentList.push(...newRList);
 
-    setAgentList(newAgentList);
+    newWorldState.agentList = newAgentList;
     if (isSimulationEnd) {
       clearInterval(interval);
       setGameState("stopped");
@@ -173,8 +190,9 @@ function App() {
       labels: newLabels,
       datasets: [newIDataset, newRDataset, newSDataset],
     };
+    newWorldState.chartData = newChartData;
 
-    setChartData(newChartData);
+    setWorldState(newWorldState);
   };
 
   return (
@@ -245,20 +263,6 @@ function App() {
                     setInfectionRadius(newValue);
                   }}
                 />
-                <Typography variant="overline" gutterBottom>
-                  Spread Probability
-                </Typography>
-                <Slider
-                  valueLabelDisplay="auto"
-                  step={0.05}
-                  marks
-                  min={0}
-                  max={1}
-                  value={spreadProbability}
-                  onChange={(event, newValue) => {
-                    setSpreadProbability(newValue);
-                  }}
-                />
 
                 <Typography variant="overline" gutterBottom>
                   Mean Infection Duration
@@ -274,6 +278,27 @@ function App() {
                     setInfectionDuration(newValue);
                   }}
                 />
+
+                <Typography variant="overline" gutterBottom>
+                  Spread Probability
+                </Typography>
+                <br />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={spreadProbability >= 0.1}
+                      onChange={(event) => {
+                        if (event.target.checked) {
+                          setSpreadProbability(0.1);
+                        } else {
+                          setSpreadProbability(0.01);
+                        }
+                      }}
+                    />
+                  }
+                  label="Increased Probability"
+                />
+                <br />
 
                 <Typography variant="overline" gutterBottom>
                   Profile
@@ -372,29 +397,30 @@ function App() {
                       overflow="hidden"
                     >
                       <PixiRenderer
-                        agentList={agentList}
+                        worldState={worldState}
                         worldWidth={worldWidth}
                         worldHeight={worldHeight}
-                        renderWidth={minDim}
-                        renderHeight={minDim}
+                        currentWidth={minDim}
+                        currentHeight={minDim}
                         stepDuration={stepDuration}
                       />
-                      {!isNaN(size.height) && !isNaN(size.width) && chartData && (
-                        <LineChart
-                          height={size.height-minDim}
-                          width={size.width}
-                          chartData={chartData}
-                          chartRef={chartRef}
-                          
-                        />
-                      )}
+                      {!isNaN(size.height) &&
+                        !isNaN(size.width) &&
+                        worldState.chartData && (
+                          <LineChart
+                            height={size.height - minDim - 10}
+                            width={size.width}
+                            chartData={worldState.chartData}
+                            chartRef={chartRef}
+                          />
+                        )}
                     </Box>
                   );
                 }}
               </SizeMe>
             </Grid>
             <Grid item xs={2}>
-              <TimeDisplay time={time} mode={dayPhase} />
+              <TimeDisplay time={worldState.time} mode={worldState.dayPhase} />
             </Grid>
           </Grid>
         </Container>
