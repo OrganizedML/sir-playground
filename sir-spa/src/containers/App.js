@@ -304,8 +304,10 @@ function App() {
                       onChange={(event) => {
                         if (event.target.checked) {
                           setSpreadProbability(0.1);
+                          model.set_spread_probability(0.1);
                         } else {
                           setSpreadProbability(0.01);
+                          model.set_spread_probability(0.01);
                         }
                       }}
                     />
@@ -325,8 +327,10 @@ function App() {
                       onChange={(event) => {
                         if (event.target.checked) {
                           setStrongerRepulsion(true);
+                          model.set_stronger_repulsion(true);
                         } else {
                           setStrongerRepulsion(false);
+                          model.set_stronger_repulsion(false);
                         }
                       }}
                     />
@@ -346,8 +350,10 @@ function App() {
                       onChange={(event) => {
                         if (event.target.checked) {
                           setStayAtHome(true);
+                          model.set_stay_at_home(true);
                         } else {
                           setStayAtHome(false);
+                          model.set_stay_at_home(false);
                         }
                       }}
                     />
@@ -363,9 +369,16 @@ function App() {
                         if (event.target.checked) {
                           setStayAtHomeAll(true);
                           setStayAtHome(true);
+                          
+                          model.set_stay_at_home(true);
+                          model.set_exit_lock(true);
                         } else {
                           setStayAtHomeAll(false);
                           setStayAtHome(false);
+
+                          
+                          model.set_stay_at_home(false);
+                          model.set_exit_lock(false);
                         }
                       }}
                     />

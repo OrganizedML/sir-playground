@@ -140,6 +140,22 @@ class SIR_Model {
       }
     }
 
+    set_stay_at_home(bool) {
+      this.stay_at_home = bool;
+    }
+
+    set_exit_lock(bool) {
+      this.exit_lock = bool;
+    }
+    
+    set_stronger_repulsion(bool) {
+      this.stronger_repulsion = bool;
+    }
+
+    set_spread_probability(bool) {
+      this.infection_probability_onContact = bool;
+    }
+
 
     move_to_r(list_uids, from) {
       var uid;
