@@ -145,6 +145,10 @@ const PixiRenderer = React.memo(
           hotSpotInfo.sprite.width = heightWidth;
           hotSpotInfo.sprite.height = heightWidth;
         });
+        if (infoText) {
+          infoText.x = (app.renderer.width - infoText.width) / 2;
+          infoText.y = (app.renderer.height - infoText.height) / 2;
+        }
       };
       app.ticker.add(tickerFunc);
     }, [app, mainContainer, worldHeight, worldWidth, stepDuration]);
@@ -239,8 +243,6 @@ const PixiRenderer = React.memo(
         } else {
           sprite = new PIXI.Sprite(susceptibleTex);
 
-          sprite.width = renderingSize / worldWidth;
-          sprite.height = renderingSize / worldHeight;
 
           mainContainer.addChild(sprite);
           if (renderIds) {
@@ -319,8 +321,6 @@ const PixiRenderer = React.memo(
         fill: 0x000000,
         align: "center",
       });
-      infoText.x = (renderingSize - infoText.width) / 2;
-      infoText.y = (renderingSize - infoText.height) / 2;
       app.stage.addChild(infoText);
       infoText.filters = [];
     } else if (app && mainContainer) {
