@@ -284,6 +284,7 @@ const PixiRenderer = React.memo(
       app &&
       (worldState.state == "stopped" || worldState.state == "paused")
     ) {
+      app.stage.removeChild(infoText);
       mainContainer.filters = [new PIXI.filters.BlurFilter(12, 4, 1, 5)];
       infoText = new PIXI.Text(`The simulation is ${worldState.state}.`, {
         fontFamily: "Arial",
