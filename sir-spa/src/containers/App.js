@@ -44,6 +44,9 @@ function App() {
   const [probabilityRecognized, setProbabilityRecognized] = useState(0.3);
   const [infectionRadius, setInfectionRadius] = useState(2);
   const [spreadProbability, setSpreadProbability] = useState(0.01);
+  const [strongerRepulsion, setStrongerRepulsion] = useState(false);
+  const [stayAtHome, setStayAtHome] = useState(false); 
+  const [stayAtHomeAll, setStayAtHomeAll] = useState(false);
   const [infectionDuration, setInfectionDuration] = useState(10);
   const [profile, setProfile] = useState("unrestricted");
   const [stepDuration, setStepDuration] = useState(0.5);
@@ -58,7 +61,10 @@ function App() {
       spreadProbability,
       20,
       probabilityRecognized,
-      999999999999
+      999999999999,
+      stayAtHome,
+      strongerRepulsion,
+      stayAtHomeAll
     );
 
     model.reset();
@@ -75,7 +81,8 @@ function App() {
       return {
         pos: attractivePoint[0],
         strength: attractivePoint[1],
-        range: attractivePoint[4  ],
+        range: attractivePoint[3],
+        group: attractivePoint[4]
       };
     });
     newWorldState.hotSpots = newHotSpots;
@@ -240,7 +247,7 @@ function App() {
                 </Typography>
                 <Slider
                   valueLabelDisplay="auto"
-                  step={0.05}
+                  step={0.1}
                   marks
                   min={0}
                   max={1}
@@ -256,8 +263,8 @@ function App() {
                   valueLabelDisplay="auto"
                   step={1}
                   marks
-                  min={1}
-                  max={5}
+                  min={2}
+                  max={4}
                   value={infectionRadius}
                   onChange={(event, newValue) => {
                     setInfectionRadius(newValue);
@@ -269,10 +276,10 @@ function App() {
                 </Typography>
                 <Slider
                   valueLabelDisplay="auto"
-                  step={5}
+                  step={1}
                   marks
-                  min={5}
-                  max={15}
+                  min={3}
+                  max={8}
                   value={infectionDuration}
                   onChange={(event, newValue) => {
                     setInfectionDuration(newValue);
@@ -297,6 +304,65 @@ function App() {
                     />
                   }
                   label="Increased Probability"
+                />
+                <br />
+
+                <Typography variant="overline" gutterBottom>
+                  Social distancing
+                </Typography>
+                <br />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={strongerRepulsion}
+                      onChange={(event) => {
+                        if (event.target.checked) {
+                          setStrongerRepulsion(true);
+                        } else {
+                          setStrongerRepulsion(false);
+                        }
+                      }}
+                    />
+                  }
+                  label="Try to hold distance"
+                />
+                <br />
+
+                <Typography variant="overline" gutterBottom>
+                  Stay at home
+                </Typography>
+                <br />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={stayAtHome}
+                      onChange={(event) => {
+                        if (event.target.checked) {
+                          setStayAtHome(true);
+                        } else {
+                          setStayAtHome(false);
+                        }
+                      }}
+                    />
+                  }
+                  label="Infected"
+                />
+                <br /><FormControlLabel
+                  control={
+                    <Switch
+                      checked={stayAtHomeAll}
+                      onChange={(event) => {
+                        if (event.target.checked) {
+                          setStayAtHomeAll(true);
+                          setStayAtHome(true);
+                        } else {
+                          setStayAtHomeAll(false);
+                          setStayAtHome(false);
+                        }
+                      }}
+                    />
+                  }
+                  label="Everybody"
                 />
                 <br />
 
@@ -352,7 +418,10 @@ function App() {
                             spreadProbability,
                             infectionDuration,
                             probabilityRecognized,
-                            999999999999
+                            999999999999,
+                            stayAtHome,
+                            strongerRepulsion,
+                            stayAtHomeAll
                           );
 
                           model.reset();

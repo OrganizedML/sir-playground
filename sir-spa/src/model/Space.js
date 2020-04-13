@@ -21,9 +21,10 @@ class Space {
 
     load_world_layout(selection) {
         if (selection == "work") {
-            this.add_attraction_at([Math.floor(this.width/5), Math.floor(4*this.width/5)], this.work_multiplier, ["work"], -1, 1);
-            this.add_attraction_at([Math.floor(4*this.width/5), Math.floor(this.width/5)], this.work_multiplier, ["work"], -1, 2);
-            this.add_attraction_at([Math.floor(4*this.width/5), Math.floor(4*this.width/5)], this.work_multiplier, ["afterwork","evening"], 10, -1); // down right
+            this.add_attraction_at([Math.floor(this.width/5), Math.floor(4*this.height/5)], this.work_multiplier, ["work"], -1, 1);
+            this.add_attraction_at([Math.floor(4*this.width/5), Math.floor(this.height/5)], this.work_multiplier, ["work"], -1, 2);
+            this.add_attraction_at([Math.floor(2*this.width/5), Math.floor(this.height/5)], this.work_multiplier, ["work"], -1, 3);
+            this.add_attraction_at([Math.floor(4*this.width/5), Math.floor(4*this.height/5)], this.work_multiplier, ["afterwork","evening"], 10, -1); // down right
             //this.add_attraction_at([this.width-10, this.height-10], 0.25, ["night"], 10); // up right
             //this.add_attraction_at([10, 10], 0.25, ["evening","morning"], 10); // down left        
             //this.add_attraction_at([this.width-10, 10], 0.25, ["evening","morning"], 3); // down right
@@ -55,7 +56,7 @@ class Space {
         }
     }
 
-    get_potential_force(agent, alpha=1, beta=3) {
+    get_potential_force(agent, alpha=1, beta=2) {
         var force_x_rep = 0;
         var force_y_rep = 0;
         var force_x_att = 0;
@@ -76,10 +77,10 @@ class Space {
         }
 
         for (var att of this.attractive_points) { //-\nabla U_{att}(\mathbf{x}) = -\alpha (\mathbf{x}-\mathbf{x_{goal}}) 
-            if (att[2].includes(agent.model.current_mode)) {
+            if (att[2].includes(agent.model.current_mode) && !agent.model.exit_lock) {
                 var dist = distance(agent.position, att[0]);
 
-                if ((dist < att[3] || att[3] === -1) && (current_agent[3] === att[4] || att[4] === -1)) {
+                if ((dist < att[3] || att[3] === -1) && (current_agent[3] === att[4] || att[4] === -1) && NAND(agent.infected, agent.model.stay_at_home)) {
                     force_x_att += - att[1] * (agent.position[0] - att[0][0])/ dist;
                     force_y_att += - att[1] * (agent.position[1] - att[0][1])/ dist;
                 }
@@ -89,7 +90,7 @@ class Space {
         if (force_x_att === 0 && force_y_att === 0) {
             var dist = distance(agent.position, current_agent[2]); // home position
             
-            if (dist > 0.001 && !agent.model.stay_at_home) {
+            if (dist > 0.001) {
                 force_x_att = - this.home_multiplier * (agent.position[0] - current_agent[2][0])/ dist;
                 force_y_att = - this.home_multiplier * (agent.position[1] - current_agent[2][1])/ dist;
             }            
@@ -336,6 +337,11 @@ function range(start, end) {
 
 function distance(array1, array2) {
     return Math.sqrt(Math.pow(array1[0] - array2[0], 2) + Math.pow(array1[1] - array2[1], 2));
+}
+
+function NAND(x, y) {
+	// You can use whatever JS operators that you would like: &&, ||, !
+  return !(x && y);
 }
 
 export {Space}

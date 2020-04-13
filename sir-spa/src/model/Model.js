@@ -13,7 +13,10 @@ class SIR_Model {
         infection_probability_onContact=0.25,
         duration_mean=5,
         infection_recoginition_probability=0.8,
-        max_step=400
+        max_step=400,
+        stay_at_home=false,
+        stronger_repulsion=false,
+        exit_lock = false
         ) {
 
       this.population = population;
@@ -31,8 +34,9 @@ class SIR_Model {
       this.height = 50;
       
       // controls
-      this.stay_at_home = false;
-      this.stronger_repulsion = false;
+      this.stay_at_home = stay_at_home;
+      this.stronger_repulsion = stronger_repulsion;
+      this.exit_lock = exit_lock;
 
       // schedule - night - morning - work - afterwork - evening
       this.steps_each_day = 60; // half an hour
@@ -122,7 +126,7 @@ class SIR_Model {
 
         // register agent
         this.s_list.push(new_agent);
-        this.space.add_agent(new_agent, pos, getRandomInt(1,2));
+        this.space.add_agent(new_agent, pos, getRandomInt(1,3));
       }
 
       //setup infected agents
@@ -132,7 +136,7 @@ class SIR_Model {
 
         // register agent
         this.i_list.push(new_agent);
-        this.space.add_agent(new_agent, new_agent.home, getRandomInt(1,2));
+        this.space.add_agent(new_agent, new_agent.home, getRandomInt(1,3));
       }
     }
 
@@ -166,7 +170,7 @@ class SIR_Model {
         new_agent.has_infected = agent.has_infected;
 
         this.r_list.push(new_agent);        
-        this.space.add_agent(new_agent, new_agent.home, getRandomInt(1,2));
+        this.space.add_agent(new_agent, new_agent.home, getRandomInt(1,3));
       }
     }
 

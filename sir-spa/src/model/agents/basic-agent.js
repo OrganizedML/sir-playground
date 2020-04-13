@@ -40,6 +40,15 @@ class Agent{
         // random activity
         var random_multiplier = this.model.schedule_random_activity[this.model.current_mode];
         var schedule_speed = this.model.schedule_speed[this.model.current_mode];
+        if (!(NAND(this.infected, this.model.stay_at_home))) {
+            random_multiplier = 0;
+            schedule_speed = 0.5;
+        } else if (this.model.stronger_repulsion) {
+            random_multiplier = 0;
+        } else if (this.model.exit_lock) {
+            random_multiplier = 0;
+            schedule_speed *= 0.5;
+        }
         
         potForce[0] += this.dx + random_multiplier * (Math.random() - 0.5) * 2;
         potForce[1] += this.dy + random_multiplier * (Math.random() - 0.5) * 2;
@@ -92,6 +101,11 @@ function normalize_2D(array) {
     } else {
         return [array[0]/norm, array[1]/norm]
     }
+}
+
+function NAND(x, y) {
+	// You can use whatever JS operators that you would like: &&, ||, !
+  return !(x && y);
 }
 
 export {Agent}

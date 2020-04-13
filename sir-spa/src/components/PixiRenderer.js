@@ -147,19 +147,23 @@ const PixiRenderer = React.memo(
         console.log("Render Hotspots");
 
         worldState.hotSpots.forEach((hotSpot) => {
-          let gr = new PIXI.Graphics();
-          gr.beginFill(0x00ffff, 0.2);
-          gr.lineStyle(0);
-          gr.drawCircle(
-            hotSpot.strength * renderingSize,
-            hotSpot.strength * renderingSize,
-            Math.min(
+          if (hotSpot.group < 0) {
+            let gr = new PIXI.Graphics();
+            gr.beginFill(0x00ffff, 0.2);
+            gr.lineStyle(0);
+            gr.drawCircle(
               hotSpot.strength * renderingSize,
-              hotSpot.strength * renderingSize
-            )
-          );
-          gr.endFill();
-          let hotSpotTex = app.renderer.generateTexture(gr);
+              hotSpot.strength * renderingSize,
+              Math.min(
+                hotSpot.strength * renderingSize,
+                hotSpot.strength * renderingSize
+              )
+            );
+            gr.endFill();
+            var hotSpotTex = app.renderer.generateTexture(gr);
+          } else {
+            var hotSpotTex = PIXI.Texture.from("./icons8-building-100.png");
+          } // todo - fix this
           let hotSpotSprite = new PIXI.Sprite(hotSpotTex);
           hotSpotSprite.x =
             hotSpot.pos[0] * (renderingSize / worldWidth) -
