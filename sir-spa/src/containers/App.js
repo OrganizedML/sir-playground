@@ -83,7 +83,7 @@ function App() {
         strength: attractivePoint[1],
         range: attractivePoint[3],
         group: attractivePoint[4],
-        tag: attractivePoint[5]
+        tag: attractivePoint[5],
       };
     });
     newWorldState.hotSpots = newHotSpots;
@@ -221,11 +221,11 @@ function App() {
           <Typography variant="h6">SIR Playground</Typography>
         </Toolbar>
       </AppBar>
-      <Box mt={2} mb={2} flexGrow={1} overflow="hidden">
-        <Container style={{ height: "100%" }}>
-          <Box height="95%">
-            <Grid container spacing={2} style={{ height: "100%" }}>
-              <Grid item xs={4} height="100%">
+      <Box mt={2} mb={2} flexGrow={1}>
+        <Container>
+          <Box>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={4}>
                 <Box p={2}>
                   <Typography variant="overline" gutterBottom>
                     Initial Infected
@@ -463,41 +463,30 @@ function App() {
                   </Box>
                 </Box>
               </Grid>
-              <Grid item xs={6}>
-                <SizeMe monitorHeight>
-                  {({ size }) => {
-                    let minDim = Math.min(size.width, size.height * 0.7);
-                    return (
-                      <Box
-                        height="100%"
-                        display="flex"
-                        flexDirection="column"
-                        overflow="hidden"
-                      >
-                        <PixiRenderer
-                          worldState={worldState}
-                          worldWidth={worldWidth}
-                          worldHeight={worldHeight}
-                          currentWidth={minDim}
-                          currentHeight={minDim}
-                          stepDuration={stepDuration}
-                        />
-                        {!isNaN(size.height) &&
-                          !isNaN(size.width) &&
-                          worldState.chartData && (
-                            <LineChart
-                              height={size.height - minDim - 10}
-                              width={size.width}
-                              chartData={worldState.chartData}
-                              chartRef={chartRef}
-                            />
-                          )}
-                      </Box>
-                    );
-                  }}
-                </SizeMe>
+              <Grid item xs={12} sm={6}>
+                <Box
+                  height="100%"
+                  display="flex"
+                  flexDirection="column"
+                  overflow="hidden"
+                >
+                  <PixiRenderer
+                    worldState={worldState}
+                    worldWidth={worldWidth}
+                    worldHeight={worldHeight}
+                    stepDuration={stepDuration}
+                  />
+                  <Box height="200px">
+                    {worldState.chartData && (
+                      <LineChart
+                        chartData={worldState.chartData}
+                        chartRef={chartRef}
+                      />
+                    )}
+                  </Box>
+                </Box>
               </Grid>
-              <Grid item xs={2}>
+              <Grid item xs={12} sm={2}>
                 <TimeDisplay
                   time={worldState.time}
                   mode={worldState.dayPhase}
@@ -505,8 +494,12 @@ function App() {
               </Grid>
             </Grid>
           </Box>
-          <Box height="5%" display="flex" justifyContent="center">
-            <Typography variant="caption">SIR-Playground created by <Link href="https://github.com/SYoy">SYoy</Link> and <Link href="https://github.com/dani2112">dani2112</Link></Typography>
+          <Box display="flex" justifyContent="center">
+            <Typography variant="caption">
+              SIR-Playground created by{" "}
+              <Link href="https://github.com/SYoy">SYoy</Link> and{" "}
+              <Link href="https://github.com/dani2112">dani2112</Link>
+            </Typography>
           </Box>
         </Container>
       </Box>
