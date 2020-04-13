@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/sir-playground/static/css/main.3e142e2c.chunk.css",
-    "main.js": "/sir-playground/static/js/main.8c540cfd.chunk.js",
-    "main.js.map": "/sir-playground/static/js/main.8c540cfd.chunk.js.map",
+    "main.css": "/sir-playground/static/css/main.abbe9163.chunk.css",
+    "main.js": "/sir-playground/static/js/main.6c43511b.chunk.js",
+    "main.js.map": "/sir-playground/static/js/main.6c43511b.chunk.js.map",
     "runtime-main.js": "/sir-playground/static/js/runtime-main.78c6e369.js",
     "runtime-main.js.map": "/sir-playground/static/js/runtime-main.78c6e369.js.map",
-    "static/js/2.a729cb89.chunk.js": "/sir-playground/static/js/2.a729cb89.chunk.js",
-    "static/js/2.a729cb89.chunk.js.map": "/sir-playground/static/js/2.a729cb89.chunk.js.map",
+    "static/js/2.244d3be5.chunk.js": "/sir-playground/static/js/2.244d3be5.chunk.js",
+    "static/js/2.244d3be5.chunk.js.map": "/sir-playground/static/js/2.244d3be5.chunk.js.map",
     "index.html": "/sir-playground/index.html",
-    "precache-manifest.b1c61f1edc818118ce184b33260626cb.js": "/sir-playground/precache-manifest.b1c61f1edc818118ce184b33260626cb.js",
+    "precache-manifest.5e5cf0b99a13c938f88ddf42ce060976.js": "/sir-playground/precache-manifest.5e5cf0b99a13c938f88ddf42ce060976.js",
     "service-worker.js": "/sir-playground/service-worker.js",
-    "static/css/main.3e142e2c.chunk.css.map": "/sir-playground/static/css/main.3e142e2c.chunk.css.map",
-    "static/js/2.a729cb89.chunk.js.LICENSE.txt": "/sir-playground/static/js/2.a729cb89.chunk.js.LICENSE.txt",
+    "static/css/main.abbe9163.chunk.css.map": "/sir-playground/static/css/main.abbe9163.chunk.css.map",
+    "static/js/2.244d3be5.chunk.js.LICENSE.txt": "/sir-playground/static/js/2.244d3be5.chunk.js.LICENSE.txt",
     "static/media/icons8-business-buildings.svg": "/sir-playground/static/media/icons8-business-buildings.d40fc481.svg",
     "static/media/icons8-manufacturing.svg": "/sir-playground/static/media/icons8-manufacturing.6a1458e1.svg",
     "static/media/icons8-organization.svg": "/sir-playground/static/media/icons8-organization.4b917871.svg",
@@ -19,8 +19,8 @@
   },
   "entrypoints": [
     "static/js/runtime-main.78c6e369.js",
-    "static/js/2.a729cb89.chunk.js",
-    "static/css/main.3e142e2c.chunk.css",
-    "static/js/main.8c540cfd.chunk.js"
+    "static/js/2.244d3be5.chunk.js",
+    "static/css/main.abbe9163.chunk.css",
+    "static/js/main.6c43511b.chunk.js"
   ]
 }
