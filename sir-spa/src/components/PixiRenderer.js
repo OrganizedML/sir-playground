@@ -13,7 +13,6 @@ let infectedUnrecognizedTex;
 let recoveredTex;
 let app;
 let mainContainer;
-let initialRatio;
 const renderingSize = 600;
 let infoText;
 
@@ -28,16 +27,14 @@ const PixiRenderer = React.memo(
     worldState,
     worldWidth,
     worldHeight,
-    currentWidth,
-    currentHeight,
     stepDuration,
   }) => {
     const stageContainer = useRef(null);
 
     // Initial app setup and resize
     useEffect(() => {
-      if (currentHeight && currentWidth && !app) {
-        initialRatio = currentHeight / currentWidth;
+      if (!app && worldWidth && worldHeight) {
+        
         app = new PIXI.Application({
           width: renderingSize,
           height: renderingSize,
@@ -95,20 +92,7 @@ const PixiRenderer = React.memo(
 
         recoveredTex = app.renderer.generateTexture(gr);
       }
-      if (app && currentHeight && currentWidth) {
-        let w;
-        let h;
-        if (currentHeight / currentWidth >= initialRatio) {
-          w = currentWidth * initialRatio;
-          h = currentHeight;
-        } else {
-          w = currentWidth;
-          h = currentHeight / initialRatio;
-        }
-        app.renderer.view.style.width = w + "px";
-        app.renderer.view.style.height = h + "px";
-      }
-    }, [currentHeight, currentWidth]);
+    }, [worldWidth, worldHeight]);
 
     // Game loop setup
     useEffect(() => {
@@ -127,7 +111,7 @@ const PixiRenderer = React.memo(
         elapsedTime += deltaTime / PIXI.settings.TARGET_FPMS / 1000;
         Object.keys(agents).forEach((unique_id) => {
           let agentInfo = agents[unique_id];
-
+          
           agentInfo.sprite.x =
             agentInfo.oldPos[0] * (renderingSize / worldWidth) +
             (agentInfo.agent.position[0] * (renderingSize / worldWidth) -
@@ -138,7 +122,6 @@ const PixiRenderer = React.memo(
             (agentInfo.agent.position[1] * (renderingSize / worldHeight) -
               agentInfo.oldPos[1] * (renderingSize / worldHeight)) *
               Math.min(elapsedTime / stepDuration, 1.0);
-
           if (renderIds) {
             agentInfo.text.x = agentInfo.sprite.x;
             agentInfo.text.y = agentInfo.sprite.y + renderingSize / worldHeight;
@@ -244,6 +227,8 @@ const PixiRenderer = React.memo(
 
           sprite.width = renderingSize / worldWidth;
           sprite.height = renderingSize / worldHeight;
+
+
           mainContainer.addChild(sprite);
           if (renderIds) {
             text = new PIXI.Text(agent.unique_id.toString(), {
@@ -331,7 +316,7 @@ const PixiRenderer = React.memo(
     }
 
     elapsedTime = 0.0;
-    return <div ref={stageContainer}></div>;
+    return <div style={{width: "100%"}} ref={stageContainer}></div>;
   }
 );
 
