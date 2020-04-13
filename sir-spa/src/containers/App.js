@@ -8,12 +8,11 @@ import {
   Container,
   Grid,
   Slider,
-  MenuItem,
-  Select,
   Button,
   Divider,
   FormControlLabel,
   Switch,
+  Link,
 } from "@material-ui/core";
 import { PixiRenderer } from "components/PixiRenderer";
 import { TimeDisplay } from "components/TimeDisplay";
@@ -92,7 +91,7 @@ function App() {
   }, [model]);
 
   useEffect(() => {
-    clearInterval(interval)
+    clearInterval(interval);
     if (worldState.state === "running") {
       interval = setInterval(() => {
         let newWorldState = { ...worldState };
@@ -196,7 +195,9 @@ function App() {
           newSDataset.data.push(histEl.susceptible);
           newIDataset.data.push(histEl.infected);
           newRDataset.data.push(histEl.recovered);
-          newIIRDataset.data.push(histEl.infected + histEl.infectedUnrecognized)
+          newIIRDataset.data.push(
+            histEl.infected + histEl.infectedUnrecognized
+          );
           newLabels.push(index);
         });
 
@@ -209,7 +210,7 @@ function App() {
         setWorldState(newWorldState);
       }, stepDuration * 1000);
     } else {
-      clearInterval(interval)
+      clearInterval(interval);
     }
   }, [worldState.state, stepDuration]);
 
@@ -222,301 +223,291 @@ function App() {
       </AppBar>
       <Box mt={2} mb={2} flexGrow={1} overflow="hidden">
         <Container style={{ height: "100%" }}>
-          <Grid container spacing={2} style={{ height: "100%" }}>
-            <Grid item xs={4} height="100%">
-              <Box p={2}>
-                <Typography variant="overline" gutterBottom>
-                  Initial Infected
-                </Typography>
-                <Slider
-                  valueLabelDisplay="auto"
-                  step={1}
-                  marks
-                  min={1}
-                  max={10}
-                  value={initialInfected}
-                  onChange={(event, newValue) => {
-                    setInitialInfected(newValue);
-                  }}
-                />
-                <Typography variant="overline" gutterBottom>
-                  Population
-                </Typography>
-                <Slider
-                  valueLabelDisplay="auto"
-                  step={25}
-                  marks
-                  min={25}
-                  max={500}
-                  value={initialSuspectible}
-                  onChange={(event, newValue) => {
-                    setInitialSuspectible(newValue);
-                  }}
-                />
-                <Typography variant="overline" gutterBottom>
-                  Probability Recognized
-                </Typography>
-                <Slider
-                  valueLabelDisplay="auto"
-                  step={0.1}
-                  marks
-                  min={0}
-                  max={1}
-                  value={probabilityRecognized}
-                  onChange={(event, newValue) => {
-                    setProbabilityRecognized(newValue);
-                  }}
-                />
-                <Typography variant="overline" gutterBottom>
-                  Infection Radius
-                </Typography>
-                <Slider
-                  valueLabelDisplay="auto"
-                  step={1}
-                  marks
-                  min={2}
-                  max={4}
-                  value={infectionRadius}
-                  onChange={(event, newValue) => {
-                    setInfectionRadius(newValue);
-                  }}
-                />
-
-                <Typography variant="overline" gutterBottom>
-                  Mean Infection Duration
-                </Typography>
-                <Slider
-                  valueLabelDisplay="auto"
-                  step={1}
-                  marks
-                  min={3}
-                  max={8}
-                  value={infectionDuration}
-                  onChange={(event, newValue) => {
-                    setInfectionDuration(newValue);
-                  }}
-                />
-
-                <Typography variant="overline" gutterBottom>
-                  Spread Probability
-                </Typography>
-                <br />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={spreadProbability >= 0.1}
-                      onChange={(event) => {
-                        if (event.target.checked) {
-                          setSpreadProbability(0.1);
-                          model.set_spread_probability(0.1);
-                        } else {
-                          setSpreadProbability(0.01);
-                          model.set_spread_probability(0.01);
-                        }
-                      }}
-                    />
-                  }
-                  label="Increased Probability"
-                />
-                <br />
-
-                <Typography variant="overline" gutterBottom>
-                  Social distancing
-                </Typography>
-                <br />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={strongerRepulsion}
-                      onChange={(event) => {
-                        if (event.target.checked) {
-                          setStrongerRepulsion(true);
-                          model.set_stronger_repulsion(true);
-                        } else {
-                          setStrongerRepulsion(false);
-                          model.set_stronger_repulsion(false);
-                        }
-                      }}
-                    />
-                  }
-                  label="Try to hold distance"
-                />
-                <br />
-
-                <Typography variant="overline" gutterBottom>
-                  Stay at home
-                </Typography>
-                <br />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={stayAtHome}
-                      onChange={(event) => {
-                        if (event.target.checked) {
-                          setStayAtHome(true);
-                          model.set_stay_at_home(true);
-                        } else {
-                          setStayAtHome(false);
-                          model.set_stay_at_home(false);
-                        }
-                      }}
-                    />
-                  }
-                  label="Infected"
-                />
-                <br />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={stayAtHomeAll}
-                      onChange={(event) => {
-                        if (event.target.checked) {
-                          setStayAtHomeAll(true);
-                          setStayAtHome(true);
-                          
-                          model.set_stay_at_home(true);
-                          model.set_exit_lock(true);
-                        } else {
-                          setStayAtHomeAll(false);
-                          setStayAtHome(false);
-
-                          
-                          model.set_stay_at_home(false);
-                          model.set_exit_lock(false);
-                        }
-                      }}
-                    />
-                  }
-                  label="Everybody"
-                />
-                <br />
-
-                <Typography variant="overline" gutterBottom>
-                  Profile
-                </Typography>
-                <br />
-                <Select
-                  fullWidth
-                  variant="outlined"
-                  value={profile}
-                  onChange={(event) => {
-                    setProfile(event.target.value);
-                  }}
-                >
-                  <MenuItem value={"unrestricted"}>Unrestricted</MenuItem>
-                  <MenuItem value={"shopping_work"}>
-                    Shopping &amp; Work
-                  </MenuItem>
-                  <MenuItem value={"meet_friends"}>Meet Friends</MenuItem>
-                </Select>
-                <Divider />
-                <Typography variant="overline" gutterBottom>
-                  Step Period (s)
-                </Typography>
-                <Slider
-                  valueLabelDisplay="auto"
-                  step={0.1}
-                  marks
-                  min={0.1}
-                  max={2.0}
-                  value={stepDuration}
-                  onChange={(event, newValue) => {
-                    setStepDuration(newValue);
-                  }}
-                />
-                <Box mt={2}>
-                  <Button
-                    color="primary"
-                    variant="contained"
-                    size="large"
-                    onClick={() => {
-                      let newWorldState = { ...worldState };
-                      if (worldState.state == "running") {
-                        newWorldState.state = "paused";
-                        clearInterval(interval);
-                      } else {
-                        if (worldState.state == "stopped") {
-                          model = new SIR_Model(
-                            initialSuspectible,
-                            initialInfected,
-                            infectionRadius,
-                            spreadProbability,
-                            infectionDuration,
-                            probabilityRecognized,
-                            999999999999,
-                            stayAtHome,
-                            strongerRepulsion,
-                            stayAtHomeAll
-                          );
-
-                          model.reset();
-                          model.initialize();
-                          setWorldHeight(model.height);
-                          setWorldWidth(model.width);
-                        }
-
-                        newWorldState.state = "running";
-                      }
-                      setWorldState(newWorldState);
+          <Box height="95%">
+            <Grid container spacing={2} style={{ height: "100%" }}>
+              <Grid item xs={4} height="100%">
+                <Box p={2}>
+                  <Typography variant="overline" gutterBottom>
+                    Initial Infected
+                  </Typography>
+                  <Slider
+                    valueLabelDisplay="auto"
+                    step={1}
+                    marks
+                    min={1}
+                    max={10}
+                    value={initialInfected}
+                    onChange={(event, newValue) => {
+                      setInitialInfected(newValue);
                     }}
-                  >
-                    {worldState.state === "running" ? "Pause" : "Start"}
-                  </Button>
-                  &nbsp;&nbsp;
-                  <Button
-                    color="primary"
-                    variant="contained"
-                    size="large"
-                    onClick={() => {
-                      let newWorldState = { ...worldState };
-                      history = [];
-                      newWorldState.state = "stopped";
-                      setWorldState(newWorldState);
+                  />
+                  <Typography variant="overline" gutterBottom>
+                    Population
+                  </Typography>
+                  <Slider
+                    valueLabelDisplay="auto"
+                    step={25}
+                    marks
+                    min={25}
+                    max={500}
+                    value={initialSuspectible}
+                    onChange={(event, newValue) => {
+                      setInitialSuspectible(newValue);
                     }}
-                  >
-                    Reset
-                  </Button>
-                </Box>
-              </Box>
-            </Grid>
-            <Grid item xs={6}>
-              <SizeMe monitorHeight>
-                {({ size }) => {
-                  let minDim = Math.min(size.width, size.height * 0.7);
-                  return (
-                    <Box
-                      height="100%"
-                      display="flex"
-                      flexDirection="column"
-                      overflow="hidden"
-                    >
-                      <PixiRenderer
-                        worldState={worldState}
-                        worldWidth={worldWidth}
-                        worldHeight={worldHeight}
-                        currentWidth={minDim}
-                        currentHeight={minDim}
-                        stepDuration={stepDuration}
+                  />
+                  <Typography variant="overline" gutterBottom>
+                    Probability Recognized
+                  </Typography>
+                  <Slider
+                    valueLabelDisplay="auto"
+                    step={0.1}
+                    marks
+                    min={0}
+                    max={1}
+                    value={probabilityRecognized}
+                    onChange={(event, newValue) => {
+                      setProbabilityRecognized(newValue);
+                    }}
+                  />
+                  <Typography variant="overline" gutterBottom>
+                    Infection Radius
+                  </Typography>
+                  <Slider
+                    valueLabelDisplay="auto"
+                    step={1}
+                    marks
+                    min={2}
+                    max={4}
+                    value={infectionRadius}
+                    onChange={(event, newValue) => {
+                      setInfectionRadius(newValue);
+                    }}
+                  />
+
+                  <Typography variant="overline" gutterBottom>
+                    Mean Infection Duration
+                  </Typography>
+                  <Slider
+                    valueLabelDisplay="auto"
+                    step={1}
+                    marks
+                    min={3}
+                    max={8}
+                    value={infectionDuration}
+                    onChange={(event, newValue) => {
+                      setInfectionDuration(newValue);
+                    }}
+                  />
+
+                  <Typography variant="overline" gutterBottom>
+                    Spread Probability
+                  </Typography>
+                  <br />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={spreadProbability >= 0.1}
+                        onChange={(event) => {
+                          if (event.target.checked) {
+                            setSpreadProbability(0.1);
+                            model.set_spread_probability(0.1);
+                          } else {
+                            setSpreadProbability(0.01);
+                            model.set_spread_probability(0.01);
+                          }
+                        }}
                       />
-                      {!isNaN(size.height) &&
-                        !isNaN(size.width) &&
-                        worldState.chartData && (
-                          <LineChart
-                            height={size.height - minDim - 10}
-                            width={size.width}
-                            chartData={worldState.chartData}
-                            chartRef={chartRef}
-                          />
-                        )}
-                    </Box>
-                  );
-                }}
-              </SizeMe>
+                    }
+                    label="Increased Probability"
+                  />
+                  <br />
+
+                  <Typography variant="overline" gutterBottom>
+                    Social distancing
+                  </Typography>
+                  <br />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={strongerRepulsion}
+                        onChange={(event) => {
+                          if (event.target.checked) {
+                            setStrongerRepulsion(true);
+                            model.set_stronger_repulsion(true);
+                          } else {
+                            setStrongerRepulsion(false);
+                            model.set_stronger_repulsion(false);
+                          }
+                        }}
+                      />
+                    }
+                    label="Try to hold distance"
+                  />
+                  <br />
+
+                  <Typography variant="overline" gutterBottom>
+                    Stay at home
+                  </Typography>
+                  <br />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={stayAtHome}
+                        onChange={(event) => {
+                          if (event.target.checked) {
+                            setStayAtHome(true);
+                            model.set_stay_at_home(true);
+                          } else {
+                            setStayAtHome(false);
+                            model.set_stay_at_home(false);
+                          }
+                        }}
+                      />
+                    }
+                    label="Infected"
+                  />
+                  <br />
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={stayAtHomeAll}
+                        onChange={(event) => {
+                          if (event.target.checked) {
+                            setStayAtHomeAll(true);
+                            setStayAtHome(true);
+
+                            model.set_stay_at_home(true);
+                            model.set_exit_lock(true);
+                          } else {
+                            setStayAtHomeAll(false);
+                            setStayAtHome(false);
+
+                            model.set_stay_at_home(false);
+                            model.set_exit_lock(false);
+                          }
+                        }}
+                      />
+                    }
+                    label="Everybody"
+                  />
+                  <br />
+                  <Box mt={2} mb={2}>
+                    <Divider />
+                  </Box>
+                  <Typography variant="overline" gutterBottom>
+                    Step Period (s)
+                  </Typography>
+                  <Slider
+                    valueLabelDisplay="auto"
+                    step={0.1}
+                    marks
+                    min={0.1}
+                    max={2.0}
+                    value={stepDuration}
+                    onChange={(event, newValue) => {
+                      setStepDuration(newValue);
+                    }}
+                  />
+                  <Box mt={2}>
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      size="large"
+                      onClick={() => {
+                        let newWorldState = { ...worldState };
+                        if (worldState.state == "running") {
+                          newWorldState.state = "paused";
+                          clearInterval(interval);
+                        } else {
+                          if (worldState.state == "stopped") {
+                            model = new SIR_Model(
+                              initialSuspectible,
+                              initialInfected,
+                              infectionRadius,
+                              spreadProbability,
+                              infectionDuration,
+                              probabilityRecognized,
+                              999999999999,
+                              stayAtHome,
+                              strongerRepulsion,
+                              stayAtHomeAll
+                            );
+
+                            model.reset();
+                            model.initialize();
+                            setWorldHeight(model.height);
+                            setWorldWidth(model.width);
+                          }
+
+                          newWorldState.state = "running";
+                        }
+                        setWorldState(newWorldState);
+                      }}
+                    >
+                      {worldState.state === "running" ? "Pause" : "Start"}
+                    </Button>
+                    &nbsp;&nbsp;
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      size="large"
+                      onClick={() => {
+                        let newWorldState = { ...worldState };
+                        history = [];
+                        newWorldState.state = "stopped";
+                        setWorldState(newWorldState);
+                      }}
+                    >
+                      Reset
+                    </Button>
+                  </Box>
+                </Box>
+              </Grid>
+              <Grid item xs={6}>
+                <SizeMe monitorHeight>
+                  {({ size }) => {
+                    let minDim = Math.min(size.width, size.height * 0.7);
+                    return (
+                      <Box
+                        height="100%"
+                        display="flex"
+                        flexDirection="column"
+                        overflow="hidden"
+                      >
+                        <PixiRenderer
+                          worldState={worldState}
+                          worldWidth={worldWidth}
+                          worldHeight={worldHeight}
+                          currentWidth={minDim}
+                          currentHeight={minDim}
+                          stepDuration={stepDuration}
+                        />
+                        {!isNaN(size.height) &&
+                          !isNaN(size.width) &&
+                          worldState.chartData && (
+                            <LineChart
+                              height={size.height - minDim - 10}
+                              width={size.width}
+                              chartData={worldState.chartData}
+                              chartRef={chartRef}
+                            />
+                          )}
+                      </Box>
+                    );
+                  }}
+                </SizeMe>
+              </Grid>
+              <Grid item xs={2}>
+                <TimeDisplay
+                  time={worldState.time}
+                  mode={worldState.dayPhase}
+                />
+              </Grid>
             </Grid>
-            <Grid item xs={2}>
-              <TimeDisplay time={worldState.time} mode={worldState.dayPhase} />
-            </Grid>
-          </Grid>
+          </Box>
+          <Box height="5%" display="flex" justifyContent="center">
+            <Typography variant="caption">SIR-Playground by <Link href="https://github.com/SYoy">SYoy</Link> and <Link href="https://github.com/dani2112">dani2112</Link></Typography>
+          </Box>
         </Container>
       </Box>
     </Box>
