@@ -1,0 +1,26 @@
+{
+  "files": {
+    "main.css": "/sir-playground/static/css/main.3e142e2c.chunk.css",
+    "main.js": "/sir-playground/static/js/main.4ae7fc11.chunk.js",
+    "main.js.map": "/sir-playground/static/js/main.4ae7fc11.chunk.js.map",
+    "runtime-main.js": "/sir-playground/static/js/runtime-main.78c6e369.js",
+    "runtime-main.js.map": "/sir-playground/static/js/runtime-main.78c6e369.js.map",
+    "static/js/2.194a04d0.chunk.js": "/sir-playground/static/js/2.194a04d0.chunk.js",
+    "static/js/2.194a04d0.chunk.js.map": "/sir-playground/static/js/2.194a04d0.chunk.js.map",
+    "index.html": "/sir-playground/index.html",
+    "precache-manifest.d988f3f53a38f91a35631ebb3940736c.js": "/sir-playground/precache-manifest.d988f3f53a38f91a35631ebb3940736c.js",
+    "service-worker.js": "/sir-playground/service-worker.js",
+    "static/css/main.3e142e2c.chunk.css.map": "/sir-playground/static/css/main.3e142e2c.chunk.css.map",
+    "static/js/2.194a04d0.chunk.js.LICENSE.txt": "/sir-playground/static/js/2.194a04d0.chunk.js.LICENSE.txt",
+    "static/media/icons8-business-buildings.svg": "/sir-playground/static/media/icons8-business-buildings.d40fc481.svg",
+    "static/media/icons8-manufacturing.svg": "/sir-playground/static/media/icons8-manufacturing.6a1458e1.svg",
+    "static/media/icons8-organization.svg": "/sir-playground/static/media/icons8-organization.4b917871.svg",
+    "static/media/icons8-park-with-street-light.svg": "/sir-playground/static/media/icons8-park-with-street-light.9024a2d1.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.78c6e369.js",
+    "static/js/2.194a04d0.chunk.js",
+    "static/css/main.3e142e2c.chunk.css",
+    "static/js/main.4ae7fc11.chunk.js"
+  ]
+}
