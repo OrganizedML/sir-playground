@@ -16,6 +16,7 @@ import {
 } from "@material-ui/core";
 import { PixiRenderer } from "components/PixiRenderer";
 import { TimeDisplay } from "components/TimeDisplay";
+import { StatsDisplay } from "components/StatsDisplay";
 import { LineChart } from "components/LineChart";
 import { SizeMe } from "react-sizeme";
 // setup Google Analytics
@@ -27,8 +28,11 @@ let model = null;
 let history = [];
 
 function App() {
-  // setup Google Analytics
+  // GA
   ReactGA.initialize('UA-161194303-3');
+  ReactGA.pageview(window.location.pathname);
+  console.log("Init GA:" + ReactGA);
+
   // For rendering
   const [worldState, setWorldState] = useState({
     agentList: [],
@@ -497,7 +501,7 @@ function App() {
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={2}>
                  <TimeDisplay time={worldState.time} mode={worldState.dayPhase} day={worldState.day} R={worldState.R}/>
-              </Grid>
+              <StatsDisplay chartData={worldState.chartData} />
             </Grid>
           </Box>
           <Box display="flex" justifyContent="center">
