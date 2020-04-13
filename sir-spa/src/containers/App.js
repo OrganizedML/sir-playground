@@ -506,7 +506,7 @@ function App() {
             </Grid>
           </Box>
           <Box height="5%" display="flex" justifyContent="center">
-            <Typography variant="caption">SIR-Playground by <Link href="https://github.com/SYoy">SYoy</Link> and <Link href="https://github.com/dani2112">dani2112</Link></Typography>
+            <Typography variant="caption">SIR-Playground created by <Link href="https://github.com/SYoy">SYoy</Link> and <Link href="https://github.com/dani2112">dani2112</Link></Typography>
           </Box>
         </Container>
       </Box>
