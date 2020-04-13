@@ -26,6 +26,7 @@ let model = null;
 let history = [];
 
 function App() {
+
   // For rendering
   const [worldState, setWorldState] = useState({
     agentList: [],

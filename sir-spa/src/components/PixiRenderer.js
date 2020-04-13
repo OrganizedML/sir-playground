@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js";
 import React, { useRef, useState, useEffect } from "react";
-import BunnyImage from "./bunny.png";
+import WorkImage from "./icons8-building-100.png"
 import { GlowFilter } from "@pixi/filter-glow";
 
 const agents = {};
@@ -144,9 +144,9 @@ const PixiRenderer = React.memo(
     // Initial world state setup
     useEffect(() => {
       if (app && worldState.hotSpots) {
-        console.log("Render Hotspots");
 
         worldState.hotSpots.forEach((hotSpot) => {
+          let hotSpotTex;
           if (hotSpot.group < 0) {
             let gr = new PIXI.Graphics();
             gr.beginFill(0x00ffff, 0.2);
@@ -160,20 +160,20 @@ const PixiRenderer = React.memo(
               )
             );
             gr.endFill();
-            var hotSpotTex = app.renderer.generateTexture(gr);
+            hotSpotTex = app.renderer.generateTexture(gr);
           } else {
-            var hotSpotTex = PIXI.Texture.from("./icons8-building-100.png");
-          } // todo - fix this
+            hotSpotTex = PIXI.Texture.from(WorkImage);
+          }
           let hotSpotSprite = new PIXI.Sprite(hotSpotTex);
+          let strengthFactor = 0.2 * hotSpot.strength
           hotSpotSprite.x =
             hotSpot.pos[0] * (renderingSize / worldWidth) -
-            (hotSpot.strength * renderingSize) / 2;
+            (strengthFactor * renderingSize) / 2;
           hotSpotSprite.y =
             hotSpot.pos[1] * (renderingSize / worldHeight) -
-            (hotSpot.strength * renderingSize) / 2;
-
-          hotSpotSprite.width = hotSpot.strength * renderingSize;
-          hotSpotSprite.height = hotSpot.strength * renderingSize;
+            (strengthFactor * renderingSize) / 2;
+          hotSpotSprite.width = strengthFactor * renderingSize;
+          hotSpotSprite.height = strengthFactor * renderingSize;
           app.stage.addChild(hotSpotSprite);
         });
       }
