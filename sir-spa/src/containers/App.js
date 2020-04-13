@@ -91,6 +91,7 @@ function App() {
   }, [model]);
 
   useEffect(() => {
+    clearInterval(interval)
     if (worldState.state === "running") {
       interval = setInterval(() => {
         let newWorldState = { ...worldState };
@@ -209,7 +210,7 @@ function App() {
     } else {
       clearInterval(interval)
     }
-  }, [worldState.state]);
+  }, [worldState.state, stepDuration]);
 
   return (
     <Box display="flex" flexDirection="column" className="App" height="100%">
