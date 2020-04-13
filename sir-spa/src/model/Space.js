@@ -80,7 +80,7 @@ class Space {
             if (att[2].includes(agent.model.current_mode) && !agent.model.exit_lock) {
                 var dist = distance(agent.position, att[0]);
 
-                if ((dist < att[3] || att[3] === -1) && (current_agent[3] === att[4] || att[4] === -1) && NAND(agent.infected, agent.model.stay_at_home)) {
+                if ((dist < att[3] || att[3] === -1) && (current_agent[3] === att[4] || att[4] === -1) && NAND(agent.className == "Infected", agent.model.stay_at_home)) {
                     force_x_att += - att[1] * (agent.position[0] - att[0][0])/ dist;
                     force_y_att += - att[1] * (agent.position[1] - att[0][1])/ dist;
                 }
@@ -288,15 +288,14 @@ class Space {
     correct_boundaries(pos) {
         if (pos[0] < 0) {
             pos[0] = 0;
-        } else if (pos[0] > this.width) {
-            pos[0] = this.width;
+        } else if (pos[0] > this.width - 1) {
+            pos[0] = this.width - 1;
         }
         if (pos[1] < 0) {
             pos[1] = 0;
-        } else if (pos[1] > this.height) {
-            pos[1] = this.height;
+        } else if (pos[1] > this.height - 1) {
+            pos[1] = this.height - 1;
         }
-
         return pos
     }
 
