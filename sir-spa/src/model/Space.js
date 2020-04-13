@@ -10,22 +10,24 @@ class Space {
         this.ll = new Array();
         this.ll[0] = [-1, -1, [0, 0]];
 
-        this.home_multiplier = 0.25;
-        this.center_multiplier = 0.25;
+        this.home_multiplier = 0.75;
+        this.work_multiplier = 1;
         this.repulsion_force_multiplier = 2;
 
         // potential fields
         this.attractive_points = new Array();
-        this.load_world_layout("standard")
+        this.load_world_layout("work")
     }
 
     load_world_layout(selection) {
-        if (selection == "standard") {
-            this.add_attraction_at([Math.floor(this.width/2), Math.floor(this.width/2)], this.home_multiplier, ["work"], -1); // middle of grid as attractive force)
-            this.add_attraction_at([10, this.height-10], 0.25, ["evening","morning"]); // up left
-            this.add_attraction_at([this.width-10, this.height-10], 0.25, ["night"], 10); // up right
-            this.add_attraction_at([10, 10], 0.25, ["evening","morning"]); // down left        
-            this.add_attraction_at([this.width-10, 10], 0.25, ["evening","morning"]); // down right
+        if (selection == "work") {
+            this.add_attraction_at([Math.floor(this.width/5), Math.floor(4*this.height/5)], this.work_multiplier, ["work"], -1, 1);
+            this.add_attraction_at([Math.floor(4*this.width/5), Math.floor(this.height/5)], this.work_multiplier, ["work"], -1, 2);
+            this.add_attraction_at([Math.floor(2*this.width/5), Math.floor(this.height/5)], this.work_multiplier, ["work"], -1, 3);
+            this.add_attraction_at([Math.floor(4*this.width/5), Math.floor(4*this.height/5)], this.work_multiplier, ["afterwork","evening"], 10, -1); // down right
+            //this.add_attraction_at([this.width-10, this.height-10], 0.25, ["night"], 10); // up right
+            //this.add_attraction_at([10, 10], 0.25, ["evening","morning"], 10); // down left        
+            //this.add_attraction_at([this.width-10, 10], 0.25, ["evening","morning"], 3); // down right
         } else {
             // todo
         }
@@ -54,7 +56,7 @@ class Space {
         }
     }
 
-    get_potential_force(agent, alpha=1, beta=3) {
+    get_potential_force(agent, alpha=1, beta=2) {
         var force_x_rep = 0;
         var force_y_rep = 0;
         var force_x_att = 0;
@@ -62,7 +64,7 @@ class Space {
 
         var uid_list = this.inRange_linked_cell(agent.position, agent.unique_id, agent.model.repulsion_range); // range == infection range for movement
         var pos = this.get_local_repulsion_positions(uid_list);
-        var group = this.agent_list.filter(function(el) {return el[0] === agent.unique_id ;})[3];
+        var current_agent = this.agent_list.filter(function(ag) {return ag[0] == agent.unique_id;})[0];
         
         for (var p of pos) {
             var dist = distance(agent.position, p);
@@ -75,10 +77,10 @@ class Space {
         }
 
         for (var att of this.attractive_points) { //-\nabla U_{att}(\mathbf{x}) = -\alpha (\mathbf{x}-\mathbf{x_{goal}}) 
-            if (att[2].includes(agent.model.current_mode)) {
+            if (att[2].includes(agent.model.current_mode) && !agent.model.exit_lock) {
                 var dist = distance(agent.position, att[0]);
 
-                if ((dist < att[3] || att[3] === -1) && (group === att[4] || att[4] === -1)) {
+                if ((dist < att[3] || att[3] === -1) && (current_agent[3] === att[4] || att[4] === -1) && NAND(agent.infected, agent.model.stay_at_home)) {
                     force_x_att += - att[1] * (agent.position[0] - att[0][0])/ dist;
                     force_y_att += - att[1] * (agent.position[1] - att[0][1])/ dist;
                 }
@@ -86,15 +88,17 @@ class Space {
         }
 
         if (force_x_att === 0 && force_y_att === 0) {
-            var home_pos = this.agent_list.filter(function(ag) {return ag[0] == agent.unique_id;})[0];
-            var dist = distance(agent.position, home_pos[2]); // home position
+            var dist = distance(agent.position, current_agent[2]); // home position
             
             if (dist > 0.001) {
-                force_x_att = - this.home_multiplier * (agent.position[0] - home_pos[2][0])/ dist;
-                force_y_att = - this.home_multiplier * (agent.position[1] - home_pos[2][1])/ dist;
+                force_x_att = - this.home_multiplier * (agent.position[0] - current_agent[2][0])/ dist;
+                force_y_att = - this.home_multiplier * (agent.position[1] - current_agent[2][1])/ dist;
             }            
         }
-        // normalize  ?
+        if (agent.model.stronger_repulsion) {
+            beta += beta;
+        }
+
         var grad_x = alpha*force_x_att - beta*force_x_rep;
         var grad_y = alpha*force_y_att - beta*force_y_rep;
 
@@ -188,6 +192,11 @@ class Space {
         this.agent_list.push([agent.unique_id, agent.position, home, group])
     }
 
+    get_agent_attributes(agent) {
+        var filtered = this.agent_list.filter(function(value, index, arr){ return value[0] == agent.unique_id;});
+        return filtered
+    }
+
     remove_agent(agent) {
 
         if (agent.unique_id !== "undefined") {
@@ -204,7 +213,7 @@ class Space {
         }
     }
 
-    get_random_position_empty(radius_att_points=8) {
+    get_random_position_empty(radius_att_points=5) {
         do {
             var x = Math.floor((Math.random() * this.width));
             var y = Math.floor((Math.random() * this.height));
@@ -328,6 +337,11 @@ function range(start, end) {
 
 function distance(array1, array2) {
     return Math.sqrt(Math.pow(array1[0] - array2[0], 2) + Math.pow(array1[1] - array2[1], 2));
+}
+
+function NAND(x, y) {
+	// You can use whatever JS operators that you would like: &&, ||, !
+  return !(x && y);
 }
 
 export {Space}

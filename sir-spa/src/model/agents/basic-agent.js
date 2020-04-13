@@ -34,26 +34,35 @@ class Agent{
     // movement
     hotspot_move() {
         // todo: fix parameters, random, pot and last step
-        var empyt_cells = [];
         var potForce = this.model.space.get_potential_force(this);
         potForce = normalize_2D(potForce);
 
         // random activity
         var random_multiplier = this.model.schedule_random_activity[this.model.current_mode];
+        var schedule_speed = this.model.schedule_speed[this.model.current_mode];
+        if (!(NAND(this.infected, this.model.stay_at_home))) {
+            random_multiplier = 0;
+            schedule_speed = 0.5;
+        } else if (this.model.stronger_repulsion) {
+            random_multiplier = 0;
+        } else if (this.model.exit_lock) {
+            random_multiplier = 0;
+            schedule_speed *= 0.5;
+        }
         
         potForce[0] += this.dx + random_multiplier * (Math.random() - 0.5) * 2;
         potForce[1] += this.dy + random_multiplier * (Math.random() - 0.5) * 2;
         
         // normalize Force - maybe scale instead? 0-2?
         potForce = normalize_2D(potForce);
-        this.dx = potForce[0]; // 0-1
-        this.dy = potForce[1]; // 0-1
+        this.dx = potForce[0];
+        this.dy = potForce[1];
 
         // Move, check if overlap, correct movement - left, right, random -dont move after a few tries
         // var next_move = this.model.space.get_valid_position_from_potForce(this, potForce);
         
         // w/o overlap check
-        var next_move = [this.position[0] + potForce[0], this.position[1] + potForce[1]];
+        var next_move = [this.position[0] + this.dx * schedule_speed, this.position[1] + this.dy * schedule_speed];
         next_move = this.model.space.correct_boundaries(next_move);
 
         // admin overhead in space - world
@@ -92,6 +101,11 @@ function normalize_2D(array) {
     } else {
         return [array[0]/norm, array[1]/norm]
     }
+}
+
+function NAND(x, y) {
+	// You can use whatever JS operators that you would like: &&, ||, !
+  return !(x && y);
 }
 
 export {Agent}

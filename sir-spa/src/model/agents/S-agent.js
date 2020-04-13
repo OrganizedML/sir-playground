@@ -10,6 +10,8 @@ class Susceptible extends Agent {
       this.infected = infected;
       this.steps_since_infection = steps_since_infection;
       this.className = "Susceptible";
+
+      this.duration = this.model.duration_mean + getRandomInt(-1, 1);
     }
     
     // step
@@ -19,11 +21,11 @@ class Susceptible extends Agent {
 
         // todo: faster if not whole array?
         // interact with other agents
-        if (this.infected) {
-            if (Math.floor(this.steps_since_infection / this.model.steps_each_day) > this.model.duration_mean) {
+        if (this.infected && this.steps_since_infection > this.model.steps_till_symptoms) {
+            if (Math.floor(this.steps_since_infection / this.model.steps_each_day) > this.duration) {
                 to_r = this.unique_id;
 
-            } else if (Math.random() < this.model.infection_recoginition_probability && this.steps_since_infection > this.model.steps_till_symptoms) {
+            } else if (Math.random() < this.model.infection_recoginition_probability) {
                 to_i = this.unique_id;
 
             } else {
@@ -36,16 +38,23 @@ class Susceptible extends Agent {
                 this.spread_infection();
                 this.steps_since_infection += 1;
             }
+        } else if (this.infected) {
+            this.steps_since_infection += 1;
         }
         
         // move agent
-        // this.move()
         this.hotspot_move()
                 
         // interact with admin
         return [to_r, to_i]
     }
 
+}
+
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 export { Susceptible }

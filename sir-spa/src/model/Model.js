@@ -13,7 +13,10 @@ class SIR_Model {
         infection_probability_onContact=0.25,
         duration_mean=5,
         infection_recoginition_probability=0.8,
-        max_step=400
+        max_step=400,
+        stay_at_home=false,
+        stronger_repulsion=false,
+        exit_lock = false
         ) {
 
       this.population = population;
@@ -22,33 +25,45 @@ class SIR_Model {
       this.infection_probability_onContact = infection_probability_onContact;
       this.duration_mean = duration_mean;
       this.infection_recoginition_probability = infection_recoginition_probability;
-      this.steps_till_symptoms = 2;
       this.max_step = max_step;
-      this.movement = "random";
       this.repulsion_range = 5; // has to be greater than infection range
-
+      this.steps_till_symptoms = 60;
+      
+      // map
       this.width = 50;
       this.height = 50;
+      
+      // controls
+      this.stay_at_home = stay_at_home;
+      this.stronger_repulsion = stronger_repulsion;
+      this.exit_lock = exit_lock;
 
-      this.steps_each_day = 48; // half an hour
+      // schedule - night - morning - work - afterwork - evening
+      this.steps_each_day = 60; // half an hour
       this.step_num = 0;
       this.day = 0;
       this.current_mode = "night";
-      // schedule - night - morning - work - afterwork - evening
       this.schedule = {
-        "night": 15,
+        "night": 9,
         "morning": 19,
-        "work": 35,
-        "afterwork": 41,
-        "evening": 47
+        "work": 44,
+        "afterwork": 54,
+        "evening": 59
       }
       this.schedule_random_activity = {
         "night": 0.1,
-        "morning": 0.8,
-        "work": 0.3,
-        "afterwork": 2,
-        "evening": 0.8
+        "morning": 2,
+        "work": 0.1,
+        "afterwork": 0.5,
+        "evening": 1.5
       }
+      this.schedule_speed = {
+        "night": 0.8,
+        "morning": 1.2,
+        "work": 2,
+        "afterwork": 2,
+        "evening": 1
+      }    
     }
     
 
@@ -106,22 +121,22 @@ class SIR_Model {
       // setup population
       var unique_id;
       for (unique_id of range(1, (this.population - this.initial_infected))) {
-        var pos = this.space.get_random_position_empty();
+        var pos = this.space.get_random_position_empty(8);
         var new_agent = new Susceptible(unique_id, pos, this, false, pos);
 
         // register agent
         this.s_list.push(new_agent);
-        this.space.add_agent(new_agent, pos);
+        this.space.add_agent(new_agent, pos, getRandomInt(1,3));
       }
 
       //setup infected agents
       for (var u2 of range((unique_id + 1), (unique_id + this.initial_infected))) {
-        pos = this.space.get_random_position_empty();
+        pos = this.space.get_random_position_empty(8);
         new_agent = new Infected(u2, pos, this, false, pos);
 
         // register agent
         this.i_list.push(new_agent);
-        this.space.add_agent(new_agent, new_agent.home);
+        this.space.add_agent(new_agent, new_agent.home, getRandomInt(1,3));
       }
     }
 
@@ -155,7 +170,7 @@ class SIR_Model {
         new_agent.has_infected = agent.has_infected;
 
         this.r_list.push(new_agent);        
-        this.space.add_agent(new_agent, new_agent.home);
+        this.space.add_agent(new_agent, new_agent.home, getRandomInt(1,3));
       }
     }
 
@@ -168,6 +183,7 @@ class SIR_Model {
 
         // delete
         this.s_list = this.s_list.filter(function(value, index, arr){ return value.unique_id !== uid;})
+        var att = this.space.get_agent_attributes(agent);
         this.space.remove_agent(agent);
 
         // add new
@@ -177,7 +193,7 @@ class SIR_Model {
         new_agent.has_infected = agent.has_infected;
 
         this.i_list.push(new_agent);        
-        this.space.add_agent(new_agent, new_agent.home);
+        this.space.add_agent(new_agent, new_agent.home, att[0][3]); // infected dont go to work? , getRandomInt(1,2));
       }
     }
 
@@ -307,12 +323,6 @@ class SIR_Model {
       var num_rem = this.step_r()
       
       var curr_R0 = this.calculate_R0(num_sus[0], (num_inf + num_sus[1]), num_rem);
-      /*
-      this.R_array.push(curr_R0);
-      console.log("Basic Reproduction Number (current):" + curr_R0);
-      var R0_mean = this.R_array.slice(-10).reduce(function(pv, cv) { return pv + cv; }, 0) / this.R_array.slice(-10).length;
-      console.log("Basic Reproduction Number (mean, last 10):" + R0_mean);
-      */
 
       console.log("Day: "+ this.day);
       console.log("Mode: "+ this.current_mode);
@@ -358,6 +368,12 @@ function range(start, end) {
 
 function Sleep(milliseconds) {
   return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 export {SIR_Model}
