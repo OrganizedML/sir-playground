@@ -21,7 +21,7 @@ const StatsDisplay = React.memo(({chartData=0, R0=-1}) => {
         <Typography variant="overline">Infected and tested: {i}</Typography>
         </Box>
         <Box>
-        <Typography variant="overline">Infected (all): {i_all}</Typography>
+        <Typography variant="overline">Infected (red + blue): {i_all}</Typography>
         </Box>
         <Box>
         <Typography variant="overline">Recovered: {r}</Typography>
