@@ -339,6 +339,7 @@ class SIR_Model {
       var num_rem = this.step_r()
       
       var curr_R0 = this.calculate_R0(num_sus[0], (num_inf + num_sus[1]), num_rem);
+      this.R_array.push(curr_R0);
 
       console.log("Day: "+ this.day);
       console.log("Mode: "+ this.current_mode);
