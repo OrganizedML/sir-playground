@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "a26aa9ba8caba07dac903cfccc68b9ce",
+    "revision": "14678b420289d4ecee18263e4efffd4c",
     "url": "/sir-playground/index.html"
   },
   {
-    "revision": "a57465c243a9c33c72ef",
+    "revision": "704a761b088786ab67ce",
     "url": "/sir-playground/static/css/main.3e142e2c.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/sir-playground/static/js/2.ef9ce75d.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "a57465c243a9c33c72ef",
-    "url": "/sir-playground/static/js/main.606dffe8.chunk.js"
+    "revision": "704a761b088786ab67ce",
+    "url": "/sir-playground/static/js/main.36793bcb.chunk.js"
   },
   {
     "revision": "859fd6cfb9164bdc7071",
