@@ -48,7 +48,7 @@ function App() {
   const [strongerRepulsion, setStrongerRepulsion] = useState(false);
   const [stayAtHome, setStayAtHome] = useState(false);
   const [stayAtHomeAll, setStayAtHomeAll] = useState(false);
-  const [infectionDuration, setInfectionDuration] = useState(10);
+  const [infectionDuration, setInfectionDuration] = useState(5);
   const [profile, setProfile] = useState("unrestricted");
   const [stepDuration, setStepDuration] = useState(0.5);
 
@@ -84,6 +84,7 @@ function App() {
         strength: attractivePoint[1],
         range: attractivePoint[3],
         group: attractivePoint[4],
+        tag: attractivePoint[5]
       };
     });
     newWorldState.hotSpots = newHotSpots;
