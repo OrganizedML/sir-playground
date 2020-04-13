@@ -20,7 +20,7 @@ import { StatsDisplay } from "components/StatsDisplay";
 import { LineChart } from "components/LineChart";
 import { SizeMe } from "react-sizeme";
 // setup Google Analytics
-import ReactGA from 'react-ga';
+import ReactGA from "react-ga";
 
 let interval = null;
 let model = null;
@@ -28,11 +28,6 @@ let model = null;
 let history = [];
 
 function App() {
-  // GA
-  ReactGA.initialize('UA-161194303-3');
-  ReactGA.pageview(window.location.pathname);
-  console.log("Init GA:" + ReactGA);
-
   // For rendering
   const [worldState, setWorldState] = useState({
     agentList: [],
@@ -42,7 +37,7 @@ function App() {
     dayPhase: "day",
     state: "stopped",
     day: 0,
-    R: 1
+    R: 1,
   });
 
   const [worldWidth, setWorldWidth] = useState(undefined);
@@ -65,6 +60,9 @@ function App() {
   const chartRef = useRef(null);
 
   useEffect(() => {
+    ReactGA.initialize("UA-161194303-3");
+    ReactGA.pageview(window.location.pathname);
+
     model = new SIR_Model(
       initialSuspectible,
       initialInfected,
@@ -500,7 +498,12 @@ function App() {
                 </Box>
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={2}>
-                 <TimeDisplay time={worldState.time} mode={worldState.dayPhase} day={worldState.day} R={worldState.R}/>
+                <TimeDisplay
+                  time={worldState.time}
+                  mode={worldState.dayPhase}
+                  day={worldState.day}
+                  R={worldState.R}
+                />
                 <StatsDisplay chartData={worldState.chartData} />
               </Grid>
             </Grid>
