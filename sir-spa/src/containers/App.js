@@ -225,7 +225,7 @@ function App() {
         <Container>
           <Box>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={4}>
+              <Grid item xs={12} sm={12} md={12} lg={4}>
                 <Box p={2}>
                   <Typography variant="overline" gutterBottom>
                     Initial Infected
@@ -463,7 +463,7 @@ function App() {
                   </Box>
                 </Box>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={12} md={12} lg={6}>
                 <Box
                   height="100%"
                   display="flex"
@@ -486,7 +486,7 @@ function App() {
                   </Box>
                 </Box>
               </Grid>
-              <Grid item xs={12} sm={2}>
+              <Grid item xs={12} sm={12} md={12} lg={2}>
                 <TimeDisplay
                   time={worldState.time}
                   mode={worldState.dayPhase}

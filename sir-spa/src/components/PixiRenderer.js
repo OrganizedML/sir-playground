@@ -18,7 +18,7 @@ let infoText;
 
 let elapsedTime = 0.0;
 
-let renderIds = true;
+let renderIds = false;
 
 let tickerFunc;
 
@@ -33,7 +33,7 @@ const PixiRenderer = React.memo(
 
     // Initial app setup and resize
     useEffect(() => {
-      if (!app) {
+      if (!app && worldWidth && worldHeight) {
         
         app = new PIXI.Application({
           width: renderingSize,
@@ -92,7 +92,7 @@ const PixiRenderer = React.memo(
 
         recoveredTex = app.renderer.generateTexture(gr);
       }
-    }, []);
+    }, [worldWidth, worldHeight]);
 
     // Game loop setup
     useEffect(() => {

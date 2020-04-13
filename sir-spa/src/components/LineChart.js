@@ -9,7 +9,7 @@ const LineChart = React.memo(({chartData, chartRef }) => {
         data={chartData}
         showTooltips={false}
         options={{
-          maintainAspectRatio: true,
+          maintainAspectRatio: false,
           responsive: true,
           elements: {
             point: {
