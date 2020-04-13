@@ -7,6 +7,7 @@ import ParkImage from "./icons8-park-with-street-light.svg";
 import { GlowFilter } from "@pixi/filter-glow";
 
 const agents = {};
+const hotSpots = [];
 let susceptibleTex;
 let infectedTex;
 let infectedUnrecognizedTex;
@@ -23,22 +24,18 @@ let renderIds = false;
 let tickerFunc;
 
 const PixiRenderer = React.memo(
-  ({
-    worldState,
-    worldWidth,
-    worldHeight,
-    stepDuration,
-  }) => {
+  ({ worldState, worldWidth, worldHeight, stepDuration }) => {
     const stageContainer = useRef(null);
 
     // Initial app setup and resize
     useEffect(() => {
       if (!app && worldWidth && worldHeight) {
-        
         app = new PIXI.Application({
           width: renderingSize,
           height: renderingSize,
           transparent: true,
+          resizeTo: stageContainer.current,
+          autoDensity: true,
         });
         mainContainer = new PIXI.Container();
         app.stage.addChild(mainContainer);
@@ -111,21 +108,42 @@ const PixiRenderer = React.memo(
         elapsedTime += deltaTime / PIXI.settings.TARGET_FPMS / 1000;
         Object.keys(agents).forEach((unique_id) => {
           let agentInfo = agents[unique_id];
-          
+          let heightWidth = Math.min(
+            app.renderer.width / worldWidth,
+            app.renderer.height / worldHeight
+          );
           agentInfo.sprite.x =
-            agentInfo.oldPos[0] * (renderingSize / worldWidth) +
-            (agentInfo.agent.position[0] * (renderingSize / worldWidth) -
-              agentInfo.oldPos[0] * (renderingSize / worldWidth)) *
+            agentInfo.oldPos[0] * (app.renderer.width / worldWidth) +
+            (agentInfo.agent.position[0] * (app.renderer.width / worldWidth) -
+              agentInfo.oldPos[0] * (app.renderer.width / worldWidth)) *
               Math.min(elapsedTime / stepDuration, 1.0);
           agentInfo.sprite.y =
-            agentInfo.oldPos[1] * (renderingSize / worldHeight) +
-            (agentInfo.agent.position[1] * (renderingSize / worldHeight) -
-              agentInfo.oldPos[1] * (renderingSize / worldHeight)) *
+            agentInfo.oldPos[1] * (app.renderer.height / worldHeight) +
+            (agentInfo.agent.position[1] * (app.renderer.height / worldHeight) -
+              agentInfo.oldPos[1] * (app.renderer.height / worldHeight)) *
               Math.min(elapsedTime / stepDuration, 1.0);
+          agentInfo.sprite.width = heightWidth;
+          agentInfo.sprite.height = heightWidth;
           if (renderIds) {
             agentInfo.text.x = agentInfo.sprite.x;
-            agentInfo.text.y = agentInfo.sprite.y + renderingSize / worldHeight;
+            agentInfo.text.y =
+              agentInfo.sprite.y + app.renderer.height / worldHeight;
           }
+        });
+        hotSpots.forEach((hotSpotInfo) => {
+          let heightWidth = Math.min(
+            hotSpotInfo.strengthFactor * app.renderer.width,
+            hotSpotInfo.strengthFactor * app.renderer.height
+          );
+          hotSpotInfo.sprite.x =
+            hotSpotInfo.posX * (app.renderer.width / worldWidth) -
+            heightWidth / 2;
+          hotSpotInfo.sprite.y =
+            hotSpotInfo.posY * (app.renderer.height / worldHeight) -
+            heightWidth / 2;
+
+          hotSpotInfo.sprite.width = heightWidth;
+          hotSpotInfo.sprite.height = heightWidth;
         });
       };
       app.ticker.add(tickerFunc);
@@ -136,7 +154,10 @@ const PixiRenderer = React.memo(
       if (app && mainContainer && worldState.hotSpots) {
         worldState.hotSpots.forEach((hotSpot) => {
           let hotSpotTex;
-          if (hotSpot.group < 0 && (hotSpot.tag === "default" || hotSpot.tag === "park")) {
+          if (
+            hotSpot.group < 0 &&
+            (hotSpot.tag === "default" || hotSpot.tag === "park")
+          ) {
             let gr = new PIXI.Graphics();
             gr.beginFill(0x00ffff, 0.2);
             gr.lineStyle(0);
@@ -151,43 +172,36 @@ const PixiRenderer = React.memo(
             gr.endFill();
             hotSpotTex = app.renderer.generateTexture(gr);
             var strengthFactor = hotSpot.range / worldWidth;
-          } else if(hotSpot.group == 1 && hotSpot.tag === "default") {
+          } else if (hotSpot.group == 1 && hotSpot.tag === "default") {
             hotSpotTex = PIXI.Texture.from(WorkImage_1);
             var strengthFactor = 0.2 * hotSpot.strength;
-
-          } else if(hotSpot.group == 2 && hotSpot.tag === "default") {
+          } else if (hotSpot.group == 2 && hotSpot.tag === "default") {
             hotSpotTex = PIXI.Texture.from(WorkImage_2);
             var strengthFactor = 0.2 * hotSpot.strength;
-
-          } else if(hotSpot.group == 3 && hotSpot.tag === "default") {
+          } else if (hotSpot.group == 3 && hotSpot.tag === "default") {
             hotSpotTex = PIXI.Texture.from(WorkImage_3);
             var strengthFactor = 0.2 * hotSpot.strength;
-
           }
           let hotSpotSprite = new PIXI.Sprite(hotSpotTex);
-          hotSpotSprite.x =
-            hotSpot.pos[0] * (renderingSize / worldWidth) -
-            (strengthFactor * renderingSize) / 2;
-          hotSpotSprite.y =
-            hotSpot.pos[1] * (renderingSize / worldHeight) -
-            (strengthFactor * renderingSize) / 2;
-          hotSpotSprite.width = strengthFactor * renderingSize;
-          hotSpotSprite.height = strengthFactor * renderingSize;
           mainContainer.addChild(hotSpotSprite);
+          hotSpots.push({
+            sprite: hotSpotSprite,
+            posX: hotSpot.pos[0],
+            posY: hotSpot.pos[1],
+            strengthFactor: strengthFactor,
+          });
 
-          if(hotSpot.tag === "park") {
+          if (hotSpot.tag === "park") {
             hotSpotTex = PIXI.Texture.from(ParkImage);
             var strengthFactor = 0.2 * hotSpot.strength;
 
             let hotSpotSprite = new PIXI.Sprite(hotSpotTex);
-            hotSpotSprite.x =
-              hotSpot.pos[0] * (renderingSize / worldWidth) -
-              (strengthFactor * renderingSize) / 2;
-            hotSpotSprite.y =
-              hotSpot.pos[1] * (renderingSize / worldHeight) -
-              (strengthFactor * renderingSize) / 2;
-            hotSpotSprite.width = strengthFactor * renderingSize;
-            hotSpotSprite.height = strengthFactor * renderingSize;
+            hotSpots.push({
+              sprite: hotSpotSprite,
+              posX: hotSpot.pos[0],
+              posY: hotSpot.pos[1],
+              strengthFactor: strengthFactor,
+            });
             mainContainer.addChild(hotSpotSprite);
           }
         });
@@ -227,7 +241,6 @@ const PixiRenderer = React.memo(
 
           sprite.width = renderingSize / worldWidth;
           sprite.height = renderingSize / worldHeight;
-
 
           mainContainer.addChild(sprite);
           if (renderIds) {
@@ -316,7 +329,12 @@ const PixiRenderer = React.memo(
     }
 
     elapsedTime = 0.0;
-    return <div style={{width: "100%"}} ref={stageContainer}></div>;
+    return (
+      <div
+        style={{ width: "100%", height: "600px" }}
+        ref={stageContainer}
+      ></div>
+    );
   }
 );
 
