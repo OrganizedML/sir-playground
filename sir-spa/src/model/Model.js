@@ -39,7 +39,7 @@ class SIR_Model {
       this.exit_lock = exit_lock;
 
       // schedule - night - morning - work - afterwork - evening
-      this.steps_each_day = 60; // half an hour
+      this.steps_each_day = 70; // half an hour
       this.step_num = 0;
       this.day = 0;
       this.current_mode = "night";
@@ -47,22 +47,22 @@ class SIR_Model {
         "night": 9,
         "morning": 19,
         "work": 44,
-        "afterwork": 54,
-        "evening": 59
+        "afterwork": 58,
+        "evening": 69
       }
       this.schedule_random_activity = {
-        "night": 0.1,
-        "morning": 2,
-        "work": 0.1,
-        "afterwork": 0.5,
-        "evening": 1.5
+        "night": 0.2,
+        "morning": 1.5,
+        "work": 0.2,
+        "afterwork": 1,
+        "evening": 0.5
       }
       this.schedule_speed = {
-        "night": 0.8,
-        "morning": 1.2,
+        "night": 0.75,
+        "morning": 1.5,
         "work": 2,
-        "afterwork": 2,
-        "evening": 1
+        "afterwork": 1.75,
+        "evening": 1.25
       }    
     }
     

@@ -1,6 +1,9 @@
 import * as PIXI from "pixi.js";
 import React, { useRef, useState, useEffect } from "react";
-import WorkImage from "./icons8-building-100.png";
+import WorkImage_1 from "./icons8-business-buildings.svg";
+import WorkImage_2 from "./icons8-organization.svg";
+import WorkImage_3 from "./icons8-manufacturing.svg";
+import ParkImage from "./icons8-park-with-street-light.svg";
 import { GlowFilter } from "@pixi/filter-glow";
 
 const agents = {};
@@ -150,7 +153,7 @@ const PixiRenderer = React.memo(
       if (app && mainContainer && worldState.hotSpots) {
         worldState.hotSpots.forEach((hotSpot) => {
           let hotSpotTex;
-          if (hotSpot.group < 0) {
+          if (hotSpot.group < 0 && (hotSpot.tag === "default" || hotSpot.tag === "park")) {
             let gr = new PIXI.Graphics();
             gr.beginFill(0x00ffff, 0.2);
             gr.lineStyle(0);
@@ -164,11 +167,21 @@ const PixiRenderer = React.memo(
             );
             gr.endFill();
             hotSpotTex = app.renderer.generateTexture(gr);
-          } else {
-            hotSpotTex = PIXI.Texture.from(WorkImage);
+            var strengthFactor = hotSpot.range / worldWidth;
+          } else if(hotSpot.group == 1 && hotSpot.tag === "default") {
+            hotSpotTex = PIXI.Texture.from(WorkImage_1);
+            var strengthFactor = 0.2 * hotSpot.strength;
+
+          } else if(hotSpot.group == 2 && hotSpot.tag === "default") {
+            hotSpotTex = PIXI.Texture.from(WorkImage_2);
+            var strengthFactor = 0.2 * hotSpot.strength;
+
+          } else if(hotSpot.group == 3 && hotSpot.tag === "default") {
+            hotSpotTex = PIXI.Texture.from(WorkImage_3);
+            var strengthFactor = 0.2 * hotSpot.strength;
+
           }
           let hotSpotSprite = new PIXI.Sprite(hotSpotTex);
-          let strengthFactor = 0.2 * hotSpot.strength;
           hotSpotSprite.x =
             hotSpot.pos[0] * (renderingSize / worldWidth) -
             (strengthFactor * renderingSize) / 2;
@@ -178,6 +191,22 @@ const PixiRenderer = React.memo(
           hotSpotSprite.width = strengthFactor * renderingSize;
           hotSpotSprite.height = strengthFactor * renderingSize;
           mainContainer.addChild(hotSpotSprite);
+
+          if(hotSpot.tag === "park") {
+            hotSpotTex = PIXI.Texture.from(ParkImage);
+            var strengthFactor = 0.2 * hotSpot.strength;
+
+            let hotSpotSprite = new PIXI.Sprite(hotSpotTex);
+            hotSpotSprite.x =
+              hotSpot.pos[0] * (renderingSize / worldWidth) -
+              (strengthFactor * renderingSize) / 2;
+            hotSpotSprite.y =
+              hotSpot.pos[1] * (renderingSize / worldHeight) -
+              (strengthFactor * renderingSize) / 2;
+            hotSpotSprite.width = strengthFactor * renderingSize;
+            hotSpotSprite.height = strengthFactor * renderingSize;
+            mainContainer.addChild(hotSpotSprite);
+          }
         });
       }
     }, [app, mainContainer]);

@@ -24,7 +24,7 @@ class Space {
             this.add_attraction_at([Math.floor(this.width/5), Math.floor(4*this.height/5)], this.work_multiplier, ["work"], -1, 1);
             this.add_attraction_at([Math.floor(4*this.width/5), Math.floor(this.height/5)], this.work_multiplier, ["work"], -1, 2);
             this.add_attraction_at([Math.floor(2*this.width/5), Math.floor(this.height/5)], this.work_multiplier, ["work"], -1, 3);
-            this.add_attraction_at([Math.floor(4*this.width/5), Math.floor(4*this.height/5)], this.work_multiplier, ["afterwork","evening"], 10, -1); // down right
+            this.add_attraction_at([Math.floor(4*this.width/5), Math.floor(1*this.height/2)], this.work_multiplier, ["morning","afterwork"], 20, -1, "park"); // down right
             //this.add_attraction_at([this.width-10, this.height-10], 0.25, ["night"], 10); // up right
             //this.add_attraction_at([10, 10], 0.25, ["evening","morning"], 10); // down left        
             //this.add_attraction_at([this.width-10, 10], 0.25, ["evening","morning"], 3); // down right
@@ -33,9 +33,9 @@ class Space {
         }
     }
 
-    add_attraction_at(position, multiplier, active_at, influence_range=-1, group=-1) {
+    add_attraction_at(position, multiplier, active_at, influence_range=-1, group=-1, tag="default") {
         // active_at should be list like ["night", "afterwork"]
-        this.attractive_points.push([position, multiplier, active_at, influence_range, group]);// pos + value
+        this.attractive_points.push([position, multiplier, active_at, influence_range, group, tag]);// pos + value
     }
 
     // Linked Cell + Potential Field

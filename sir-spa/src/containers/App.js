@@ -48,7 +48,7 @@ function App() {
   const [strongerRepulsion, setStrongerRepulsion] = useState(false);
   const [stayAtHome, setStayAtHome] = useState(false);
   const [stayAtHomeAll, setStayAtHomeAll] = useState(false);
-  const [infectionDuration, setInfectionDuration] = useState(10);
+  const [infectionDuration, setInfectionDuration] = useState(5);
   const [profile, setProfile] = useState("unrestricted");
   const [stepDuration, setStepDuration] = useState(0.5);
 
@@ -84,6 +84,7 @@ function App() {
         strength: attractivePoint[1],
         range: attractivePoint[3],
         group: attractivePoint[4],
+        tag: attractivePoint[5]
       };
     });
     newWorldState.hotSpots = newHotSpots;
@@ -91,6 +92,7 @@ function App() {
   }, [model]);
 
   useEffect(() => {
+    clearInterval(interval)
     if (worldState.state === "running") {
       interval = setInterval(() => {
         let newWorldState = { ...worldState };
@@ -163,9 +165,6 @@ function App() {
           fill: true,
           lineTension: 0.1,
           borderColor: "rgba(0,0,0,1)",
-          pointBackgroundColor: "#fff",
-          pointBorderWidth: 1,
-          pointHoverRadius: 5,
           data: [],
         };
         let newIDataset = {
@@ -173,9 +172,13 @@ function App() {
           fill: true,
           lineTension: 0.1,
           borderColor: "rgba(255,0,0,1)",
-          pointBackgroundColor: "#fff",
-          pointBorderWidth: 1,
-          pointHoverRadius: 5,
+          data: [],
+        };
+        let newIIRDataset = {
+          label: "All Infected",
+          fill: true,
+          lineTension: 0.1,
+          borderColor: "rgba(255,0,0,0.4)",
           data: [],
         };
 
@@ -193,12 +196,13 @@ function App() {
           newSDataset.data.push(histEl.susceptible);
           newIDataset.data.push(histEl.infected);
           newRDataset.data.push(histEl.recovered);
+          newIIRDataset.data.push(histEl.infected + histEl.infectedUnrecognized)
           newLabels.push(index);
         });
 
         let newChartData = {
           labels: newLabels,
-          datasets: [newIDataset, newRDataset, newSDataset],
+          datasets: [newIDataset, newRDataset, newSDataset, newIIRDataset],
         };
         newWorldState.chartData = newChartData;
 
@@ -207,7 +211,7 @@ function App() {
     } else {
       clearInterval(interval)
     }
-  }, [worldState.state]);
+  }, [worldState.state, stepDuration]);
 
   return (
     <Box display="flex" flexDirection="column" className="App" height="100%">
