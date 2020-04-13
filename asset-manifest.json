@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/sir-playground/static/css/main.3e142e2c.chunk.css",
-    "main.js": "/sir-playground/static/js/main.85fd9fce.chunk.js",
-    "main.js.map": "/sir-playground/static/js/main.85fd9fce.chunk.js.map",
+    "main.js": "/sir-playground/static/js/main.53a6cff0.chunk.js",
+    "main.js.map": "/sir-playground/static/js/main.53a6cff0.chunk.js.map",
     "runtime-main.js": "/sir-playground/static/js/runtime-main.78c6e369.js",
     "runtime-main.js.map": "/sir-playground/static/js/runtime-main.78c6e369.js.map",
     "static/js/2.a11b2646.chunk.js": "/sir-playground/static/js/2.a11b2646.chunk.js",
     "static/js/2.a11b2646.chunk.js.map": "/sir-playground/static/js/2.a11b2646.chunk.js.map",
     "index.html": "/sir-playground/index.html",
-    "precache-manifest.a50584c715c58633a8e531b98dabda70.js": "/sir-playground/precache-manifest.a50584c715c58633a8e531b98dabda70.js",
+    "precache-manifest.6da9badd29b8538a9d2f0febc990b3d7.js": "/sir-playground/precache-manifest.6da9badd29b8538a9d2f0febc990b3d7.js",
     "service-worker.js": "/sir-playground/service-worker.js",
     "static/css/main.3e142e2c.chunk.css.map": "/sir-playground/static/css/main.3e142e2c.chunk.css.map",
     "static/js/2.a11b2646.chunk.js.LICENSE.txt": "/sir-playground/static/js/2.a11b2646.chunk.js.LICENSE.txt",
@@ -21,6 +21,6 @@
     "static/js/runtime-main.78c6e369.js",
     "static/js/2.a11b2646.chunk.js",
     "static/css/main.3e142e2c.chunk.css",
-    "static/js/main.85fd9fce.chunk.js"
+    "static/js/main.53a6cff0.chunk.js"
   ]
 }
