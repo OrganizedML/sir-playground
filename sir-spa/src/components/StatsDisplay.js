@@ -8,8 +8,8 @@ const StatsDisplay = React.memo(({chartData=0, R0=-1}) => {
     var r = 0;
     if (chartData.datasets.length > 0) {
         sus = chartData.datasets[2].data.slice(-1);
-        r = chartData.datasets[0].data.slice(-1);
-        i = chartData.datasets[1].data.slice(-1);
+        r = chartData.datasets[1].data.slice(-1);
+        i = chartData.datasets[0].data.slice(-1);
         i_all = chartData.datasets[3].data.slice(-1);
     }
   return (
