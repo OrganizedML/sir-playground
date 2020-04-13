@@ -501,7 +501,8 @@ function App() {
               </Grid>
               <Grid item xs={12} sm={12} md={12} lg={2}>
                  <TimeDisplay time={worldState.time} mode={worldState.dayPhase} day={worldState.day} R={worldState.R}/>
-              <StatsDisplay chartData={worldState.chartData} />
+                <StatsDisplay chartData={worldState.chartData} />
+              </Grid>
             </Grid>
           </Box>
           <Box display="flex" justifyContent="center">
