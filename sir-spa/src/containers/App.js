@@ -26,7 +26,6 @@ let model = null;
 let history = [];
 
 function App() {
-
   // For rendering
   const [worldState, setWorldState] = useState({
     agentList: [],
@@ -34,19 +33,20 @@ function App() {
     chartData: { labels: [], datasets: [] },
     time: "00:00",
     dayPhase: "day",
+    state: "stopped",
   });
+
   const [worldWidth, setWorldWidth] = useState(undefined);
   const [worldHeight, setWorldHeight] = useState(undefined);
 
   // Configuration
-  const [gameState, setGameState] = useState("stopped");
   const [initialInfected, setInitialInfected] = useState(5);
   const [initialSuspectible, setInitialSuspectible] = useState(200);
   const [probabilityRecognized, setProbabilityRecognized] = useState(0.3);
   const [infectionRadius, setInfectionRadius] = useState(2);
   const [spreadProbability, setSpreadProbability] = useState(0.01);
   const [strongerRepulsion, setStrongerRepulsion] = useState(false);
-  const [stayAtHome, setStayAtHome] = useState(false); 
+  const [stayAtHome, setStayAtHome] = useState(false);
   const [stayAtHomeAll, setStayAtHomeAll] = useState(false);
   const [infectionDuration, setInfectionDuration] = useState(10);
   const [profile, setProfile] = useState("unrestricted");
@@ -83,125 +83,131 @@ function App() {
         pos: attractivePoint[0],
         strength: attractivePoint[1],
         range: attractivePoint[3],
-        group: attractivePoint[4]
+        group: attractivePoint[4],
       };
     });
     newWorldState.hotSpots = newHotSpots;
     setWorldState(newWorldState);
   }, [model]);
 
-  const updateModel = () => {
-    let newWorldState = { ...worldState };
+  useEffect(() => {
+    if (worldState.state === "running") {
+      interval = setInterval(() => {
+        let newWorldState = { ...worldState };
 
-    let newInfectedCount = 0;
-    let newInfectedUnrecognizedCount = 0;
-    let newSusceptibleCount = 0;
-    let newRecoveredCount = 0;
+        let newInfectedCount = 0;
+        let newInfectedUnrecognizedCount = 0;
+        let newSusceptibleCount = 0;
+        let newRecoveredCount = 0;
 
-    let isSimulationEnd = model.step();
-    let hour =
-      (model.step_num % model.steps_each_day) * (24 / model.steps_each_day);
-    let newTime = new Date();
-    newTime.setSeconds(0);
-    newTime.setMinutes((hour % 1) * 60);
-    newTime.setHours(hour);
-    newWorldState.time = newTime.toLocaleTimeString("en-US");
+        let isSimulationEnd = model.step();
+        let hour =
+          (model.step_num % model.steps_each_day) * (24 / model.steps_each_day);
+        let newTime = new Date();
+        newTime.setSeconds(0);
+        newTime.setMinutes((hour % 1) * 60);
+        newTime.setHours(hour);
+        newWorldState.time = newTime.toLocaleTimeString("en-US");
 
-    newWorldState.dayPhase = model.current_mode;
+        newWorldState.dayPhase = model.current_mode;
 
-    let newAgentList = [];
-    let newSList = model.s_list.map((agent) => {
-      if (agent.infected === true) {
-        agent.state = "infected_unrecognized";
-        newInfectedUnrecognizedCount += 1;
-      } else {
-        agent.state = "susceptible";
-        newSusceptibleCount += 1;
-      }
+        let newAgentList = [];
+        let newSList = model.s_list.map((agent) => {
+          if (agent.infected === true) {
+            agent.state = "infected_unrecognized";
+            newInfectedUnrecognizedCount += 1;
+          } else {
+            agent.state = "susceptible";
+            newSusceptibleCount += 1;
+          }
 
-      return Object.assign({}, agent);
-    });
+          return Object.assign({}, agent);
+        });
 
-    newAgentList.push(...newSList);
+        newAgentList.push(...newSList);
 
-    let newIList = model.i_list.map((agent) => {
-      agent.state = "infected";
-      newInfectedCount += 1;
-      return Object.assign({}, agent);
-    });
-    newAgentList.push(...newIList);
+        let newIList = model.i_list.map((agent) => {
+          agent.state = "infected";
+          newInfectedCount += 1;
+          return Object.assign({}, agent);
+        });
+        newAgentList.push(...newIList);
 
-    let newRList = model.r_list.map((agent) => {
-      agent.state = "recovered";
-      newRecoveredCount += 1;
-      return Object.assign({}, agent);
-    });
-    newAgentList.push(...newRList);
+        let newRList = model.r_list.map((agent) => {
+          agent.state = "recovered";
+          newRecoveredCount += 1;
+          return Object.assign({}, agent);
+        });
+        newAgentList.push(...newRList);
 
-    newWorldState.agentList = newAgentList;
-    if (isSimulationEnd) {
-      clearInterval(interval);
-      setGameState("stopped");
+        newWorldState.agentList = newAgentList;
+        if (isSimulationEnd) {
+          clearInterval(interval);
+          newWorldState.state = "stopped";
+        }
+
+        let newHistoryElement = {
+          infected: newInfectedCount,
+          infectedUnrecognized: newInfectedUnrecognizedCount,
+          recovered: newRecoveredCount,
+          susceptible: newSusceptibleCount,
+        };
+
+        let newHistory = [...history];
+        newHistory.push(newHistoryElement);
+        history = newHistory;
+
+        let newLabels = [];
+        let newSDataset = {
+          label: "Susceptible",
+          fill: true,
+          lineTension: 0.1,
+          borderColor: "rgba(0,0,0,1)",
+          pointBackgroundColor: "#fff",
+          pointBorderWidth: 1,
+          pointHoverRadius: 5,
+          data: [],
+        };
+        let newIDataset = {
+          label: "Infected",
+          fill: true,
+          lineTension: 0.1,
+          borderColor: "rgba(255,0,0,1)",
+          pointBackgroundColor: "#fff",
+          pointBorderWidth: 1,
+          pointHoverRadius: 5,
+          data: [],
+        };
+
+        let newRDataset = {
+          label: "Recovered",
+          fill: true,
+          lineTension: 0.1,
+          borderColor: "rgba(0,255,0,1)",
+          pointBackgroundColor: "#fff",
+          pointBorderWidth: 1,
+          pointHoverRadius: 5,
+          data: [],
+        };
+        newHistory.forEach((histEl, index) => {
+          newSDataset.data.push(histEl.susceptible);
+          newIDataset.data.push(histEl.infected);
+          newRDataset.data.push(histEl.recovered);
+          newLabels.push(index);
+        });
+
+        let newChartData = {
+          labels: newLabels,
+          datasets: [newIDataset, newRDataset, newSDataset],
+        };
+        newWorldState.chartData = newChartData;
+
+        setWorldState(newWorldState);
+      }, stepDuration * 1000);
+    } else {
+      clearInterval(interval)
     }
-
-    let newHistoryElement = {
-      infected: newInfectedCount,
-      infectedUnrecognized: newInfectedUnrecognizedCount,
-      recovered: newRecoveredCount,
-      susceptible: newSusceptibleCount,
-    };
-
-    let newHistory = [...history];
-    newHistory.push(newHistoryElement);
-    history = newHistory;
-
-    let newLabels = [];
-    let newSDataset = {
-      label: "Susceptible",
-      fill: true,
-      lineTension: 0.1,
-      borderColor: "rgba(0,0,0,1)",
-      pointBackgroundColor: "#fff",
-      pointBorderWidth: 1,
-      pointHoverRadius: 5,
-      data: [],
-    };
-    let newIDataset = {
-      label: "Infected",
-      fill: true,
-      lineTension: 0.1,
-      borderColor: "rgba(255,0,0,1)",
-      pointBackgroundColor: "#fff",
-      pointBorderWidth: 1,
-      pointHoverRadius: 5,
-      data: [],
-    };
-
-    let newRDataset = {
-      label: "Recovered",
-      fill: true,
-      lineTension: 0.1,
-      borderColor: "rgba(0,255,0,1)",
-      pointBackgroundColor: "#fff",
-      pointBorderWidth: 1,
-      pointHoverRadius: 5,
-      data: [],
-    };
-    newHistory.forEach((histEl, index) => {
-      newSDataset.data.push(histEl.susceptible);
-      newIDataset.data.push(histEl.infected);
-      newRDataset.data.push(histEl.recovered);
-      newLabels.push(index);
-    });
-
-    let newChartData = {
-      labels: newLabels,
-      datasets: [newIDataset, newRDataset, newSDataset],
-    };
-    newWorldState.chartData = newChartData;
-
-    setWorldState(newWorldState);
-  };
+  }, [worldState.state]);
 
   return (
     <Box display="flex" flexDirection="column" className="App" height="100%">
@@ -348,7 +354,8 @@ function App() {
                   }
                   label="Infected"
                 />
-                <br /><FormControlLabel
+                <br />
+                <FormControlLabel
                   control={
                     <Switch
                       checked={stayAtHomeAll}
@@ -406,12 +413,12 @@ function App() {
                     variant="contained"
                     size="large"
                     onClick={() => {
-                      if (gameState == "running") {
-                        setGameState("paused");
+                      let newWorldState = { ...worldState };
+                      if (worldState.state == "running") {
+                        newWorldState.state = "paused";
                         clearInterval(interval);
                       } else {
-                        setGameState("running");
-                        if (gameState == "stopped") {
+                        if (worldState.state == "stopped") {
                           model = new SIR_Model(
                             initialSuspectible,
                             initialInfected,
@@ -430,14 +437,13 @@ function App() {
                           setWorldHeight(model.height);
                           setWorldWidth(model.width);
                         }
-                        interval = setInterval(
-                          updateModel,
-                          stepDuration * 1000
-                        );
+
+                        newWorldState.state = "running";
                       }
+                      setWorldState(newWorldState);
                     }}
                   >
-                    {gameState == "running" ? "Pause" : "Start"}
+                    {worldState.state === "running" ? "Pause" : "Start"}
                   </Button>
                   &nbsp;&nbsp;
                   <Button
@@ -445,9 +451,10 @@ function App() {
                     variant="contained"
                     size="large"
                     onClick={() => {
+                      let newWorldState = { ...worldState };
                       history = [];
-                      setGameState("stopped");
-                      clearInterval(interval);
+                      newWorldState.state = "stopped";
+                      setWorldState(newWorldState);
                     }}
                   >
                     Reset
