@@ -18,9 +18,6 @@ import { PixiRenderer } from "components/PixiRenderer";
 import { TimeDisplay } from "components/TimeDisplay";
 import { StatsDisplay } from "components/StatsDisplay";
 import { LineChart } from "components/LineChart";
-import { SizeMe } from "react-sizeme";
-// setup Google Analytics
-import ReactGA from "react-ga";
 
 let interval = null;
 let model = null;
@@ -44,7 +41,6 @@ function App() {
   const [worldHeight, setWorldHeight] = useState(undefined);
 
   // Configuration
-  const [gameState, setGameState] = useState("stopped");
   const [initialInfected, setInitialInfected] = useState(3);
   const [initialSuspectible, setInitialSuspectible] = useState(100);
   const [probabilityRecognized, setProbabilityRecognized] = useState(0.5);
@@ -54,14 +50,11 @@ function App() {
   const [stayAtHome, setStayAtHome] = useState(false);
   const [stayAtHomeAll, setStayAtHomeAll] = useState(false);
   const [infectionDuration, setInfectionDuration] = useState(5);
-  const [profile, setProfile] = useState("unrestricted");
   const [stepDuration, setStepDuration] = useState(0.3);
 
   const chartRef = useRef(null);
 
   useEffect(() => {
-    ReactGA.initialize("UA-161194303-3");
-    ReactGA.pageview(window.location.pathname);
 
     model = new SIR_Model(
       initialSuspectible,
