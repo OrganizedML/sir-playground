@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
+import ReactGA from "react-ga";
+import CookieConsent from "react-cookie-consent";
 import { SIR_Model } from "model/Model";
 import {
   AppBar,
@@ -55,7 +57,6 @@ function App() {
   const chartRef = useRef(null);
 
   useEffect(() => {
-
     model = new SIR_Model(
       initialSuspectible,
       initialInfected,
@@ -508,6 +509,26 @@ function App() {
               <Link href="https://github.com/dani2112">dani2112</Link>
             </Typography>
           </Box>
+          <CookieConsent
+            location="bottom"
+            buttonText="I accept"
+            cookieName="CookieConsentBanner"
+            style={{ background: "#2B373B" }}
+            buttonStyle={{ color: "#4e503b", fontSize: "13px" }}
+            expires={150}
+            onAccept={({ acceptedByScrolling }) => {
+              if (acceptedByScrolling) {                
+                ReactGA.initialize("UA-161194303-3");
+                ReactGA.pageview(window.location.pathname);
+                console.log("Cookies accepted by scrolling")
+              } else {
+                ReactGA.initialize("UA-161194303-3");
+                ReactGA.pageview(window.location.pathname);
+              }
+          }}
+          >
+            This website uses cookies to enhance the user experience.{" "}
+        </CookieConsent>
         </Container>
       </Box>
     </Box>
